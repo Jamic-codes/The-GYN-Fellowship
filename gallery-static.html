@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fellowship Photo Gallery</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', Arial, sans-serif;
+      background: url('prayer-bg.jpg') no-repeat center/cover;
+      color: #fff;
+      min-height: 100vh;
+      position: relative;
+    }
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 0;
+    }
+    nav {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: space-around;
+      background: rgba(10,23,78,0.85);
+      padding: 1rem;
+      color: #F5D042;
+      backdrop-filter: blur(8px);
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+    }
+    nav a {
+      color: #F5D042;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.2s;
+    }
+    nav a:hover {
+      text-decoration: underline;
+      color: #fffbe6;
+    }
+    .gallery-title {
+      text-align: center;
+      color: #F5D042;
+      font-size: 2.5rem;
+      margin: 40px 0 20px 0;
+      letter-spacing: 2px;
+      text-shadow: 2px 2px 8px #222;
+      z-index: 1;
+      position: relative;
+    }
+    .gallery-container {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 28px;
+      padding: 30px 20px 60px 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+    .gallery-card {
+      background: rgba(10,23,78,0.85);
+      border-radius: 18px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+      padding: 18px 12px 12px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: box-shadow 0.3s, transform 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .gallery-card:hover {
+      box-shadow: 0 8px 32px #F5D04244;
+      transform: translateY(-6px) scale(1.03);
+    }
+    .gallery-card img {
+      width: 100%;
+      max-width: 220px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+      background: #222;
+      transition: transform 0.2s;
+      cursor: pointer;
+    }
+    .gallery-card .caption {
+      color: #F5D042;
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin-bottom: 6px;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+    .gallery-card .desc {
+      color: #fffbe6;
+      font-size: 1rem;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+    @media (max-width: 700px) {
+      .gallery-container { gap: 14px; padding: 10px 2vw 40px 2vw; }
+      .gallery-card { max-width: 98vw; }
+      .gallery-title { font-size: 1.5rem; }
+    }
+    .gallery-card.highlight {
+      border: 3px solid #f5d042;
+      transition: border 0.5s ease;
+    }
+  </style>
+</head>
+<body>
+<nav>
+  <a href="welcome.html">Home</a>
+  <a href="bible Quiz.html">Game</a>
+  <a href="stories.html">Testimony</a>
+  <a href="chatroom.html">Chatroom</a>
+   <a href="calendar Events.html">Calendar/Events</a>
+ <a href="prayer wall.html">PrayerWall🔥</a>
+</nav>
+<h1 class="gallery-title">The GYN Fellowship Gallery</h1>
+<div class="gallery-container">
+  <div class="gallery-card">
+    <img src="IMG-20241203-WA0011.jpg" alt="Head of Disciple" onclick="openModal(this)">
+    <div class="caption">Disciple James Victor</div>
+    <div class="desc">No matter what season you find yourself in, remember that God is faithful. He never leaves nor forsakes His children, and His plans for you are filled with hope and purpose. When you feel weak, His strength is made perfect; when the path seems dark, His Word is a lamp to your feet. Keep pressing on, keep believing, because the same God who carried you through yesterday will surely lead you into victory today.</div>
+  </div>
+  <div class="gallery-card">
+    <img src="IMG-20250821-WA0004.jpg" alt="Bible Study" onclick="openModal(this)">
+    <div class="caption">Disciple Jackson Caryahwea</div>
+    <div class="desc">
+I would like to take this time to encourage you to remain focus, bear your yoke in your youthful age because Lamentation 3:27 says “It is good for a man that he bear the yoke in his youth”. Always try to be in the presence of the lord so that you may not fulfil the lust of the flesh, it’s either you🫵 or no one, so you can make it right with your father he’s knocking on the door of you heart, he’s always ready for you🫵 to reconcile with him, It’s either now or never Amen, let us not go far away from God🙏🏿
+</div>
+  </div>
+  <div class="gallery-card">
+    <img src="IMG-20250821-WA0008.jpg" alt="Youth Gathering" onclick="openModal(this)">
+    <div class="caption">Disciple Namue Butler</div>
+    <div class="desc"> This is my favorite scripture; Isaiah 55:9, which states “for as the heavens are higher than the earth, so are my ways higher than your ways and my thoughts higher than your thoughts.” This is a reminder that we are not wiser than God, which leads us to only trusting him, following his ways, listening to him and obeying him (God).
+So “If it’s not God way, it’s not the right way”
+</div>
+  </div>
+  <div class="gallery-card">
+    <img src="Screenshot_20250728-145218.jpg" alt="Prayer Session" onclick="openModal(this)">
+    <div class="caption">Disciple Darius Johnny</div>
+    <div class="desc">Trust in the Lord with all your heart, for He is guiding your steps even when the path seems unclear. Every challenge is an opportunity for His strength to shine through you. Keep your faith alive, for God’s plans for you are good, and His timing is perfect.</div>
+  </div>
+  <div class="gallery-card">
+    <img src="656bc3e1aa1d49d2bfbf4e024f9cb89b.jpg" alt="Sunday Service" onclick="openModal(this)">
+    <div class="caption">Disciple Moses Morris</div>
+    <div class="desc">Keep your eyes on Jesus; He is the author of your story and the answer to every prayer. Faith doesn’t make things easy, but it makes every step worth it. Trust God’s plan for your life.</div>
+  </div>
+  <!-- Add more fellowship images as needed -->
+   <div class="gallery-card">
+    <img src="IMG-20250123-WA0002.jpg" alt="Bible Study" onclick="openModal(this)">
+    <div class="caption">Praying Together</div>
+    <div class="desc">Phillippians 4:6-7 <br>@James @Abel @Butler @Jackson  </div>
+  </div>
+  <div class="gallery-card">
+    <img src="Screenshot_20250822-022408.jpg" alt="Bible Study" onclick="openModal(this)">
+    <div class="caption">Grateful Soul</div>
+    <div class="desc">Rejoice, brothers and sisters! God has been faithful, guiding us through every trial and blessing us beyond measure. Today we celebrate His goodness, His mercy, and the victories He has given us. Let our hearts overflow with gratitude, our voices lift in praise, and our lives shine as a testimony of His unfailing love! </div>
+  </div>
+  <div class="gallery-card">
+    <img src="my images/pm_1746960981680_cmp.jpg" alt="Bible Study" onclick="openModal(this)">
+    <div class="caption">Love you Bro</div>
+    <div class="desc">The Lord is calling—will you listen? Turn from sin today and seek His mercy, for His patience is not endless.
+Do not be deceived by this world; life is short, and eternity is real. Repent and draw near to God while you still can.
+  </div>
+  </div>
+  <div class="gallery-card">
+    <img src="Screenshot_20250822-003843.jpg" alt="Bible Study" onclick="openModal(this)">
+    <div class="caption">Wake up</div>
+    <div class="desc"> 	Life is fleeting, and tomorrow is never promised. Turn to God now, for He is merciful but just. Do not harden your heart or delay obedience, for His Word warns that judgment comes to those who refuse His grace. Repent, seek His forgiveness, and let Him transform your life—before it’s too late </div>
+  </div>
+  <div class="gallery-card">
+    <img src="IMG-20250123-WA0007.jpg" alt="Bible Study" onclick="openModal(this)">
+    <div class="caption">In the Awakening Stage of any Revival: </div>
+    <div class="desc"><li>Complacency is the biggest threat to the Move</li>
+    <li>Hunger is an important key in the Move</li>If the enemy steals your hunger,he will stunt your growth and the move of God in you will Die of Starvation<br>
+  <li><strong>~Mr.John-Mark D Collins~</strong></li>  </div>
+  </div>
+</div>
+
+<!-- Modal for image preview -->
+<div id="imgModal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); align-items:center; justify-content:center;">
+  <span onclick="closeModal()" style="position:absolute; top:30px; right:50px; color:#F5D042; font-size:3rem; font-weight:bold; cursor:pointer;">&times;</span>
+  <img id="modalImage" src="" alt="Preview" style="max-width:90vw; max-height:80vh; border-radius:18px; box-shadow:0 4px 24px #000; display:block; margin:auto;">
+</div>
+<script>
+
+
+  // Firebase configuration
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const storage = firebase.storage();
+
+ 
+
+function openModal(imgElem) {
+  var modal = document.getElementById('imgModal');
+  var modalImg = document.getElementById('modalImage');
+  modal.style.display = 'flex';
+  modalImg.src = imgElem.src;
+}
+function closeModal() {
+  document.getElementById('imgModal').style.display = 'none';
+}
+// Optional: close modal when clicking outside image
+document.getElementById('imgModal').onclick = function(e) {
+  if (e.target === this) closeModal();
+}
+</script>
+  <!-- Add more fellowship images as needed -->
+</div>
+  <!-- Firebase SDK (add just before </body>) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 

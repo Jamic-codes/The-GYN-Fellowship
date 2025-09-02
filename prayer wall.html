@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prayer Wall</title>
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0A174E;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  h3{
+   Background:linear-gradient(to right,#0A174E,#F5D042 );
+  Backdrop-filter: blur(8px);
+  Border-radius:10px 60px;
+  Padding: 20px;
+  Margin: 20px auto;
+  Max-width: 800px;
+  Text-align: center;
+  Color: rgba(255, 255, 255, 0.808);
+  Font-family: Arial, sans-serif;
+  Border: 2px solid #F5D042;
+  }
+  h1,summary { color: #F5D042; text-align: center; margin-top: 20px; }
+
+  #prayerForm {
+    margin: 20px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    width: 90%;
+    max-width: 800px;
+  }
+
+  #prayerForm input, #prayerForm textarea, #prayerForm button {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    font-size: 1em;
+  }
+
+  #prayerForm input, #prayerForm textarea {
+    flex: 1;
+    min-width: 150px;
+  }
+
+  #prayerForm button {
+    background: #F5D042;
+    color: #0A174E;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  #prayerWall {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    width: 90%;
+    max-width: 1200px;
+    margin-bottom: 50px;
+  }
+
+  .prayerCard {
+    background: rgba(255,255,255,0.15);
+    padding: 15px;
+    border-radius: 12px;
+    position: relative;
+    transition: transform 0.2s;
+  }
+
+  .prayerCard:hover {
+    transform: scale(1.05);
+  }
+
+  .prayBtn {
+    background: #F5D042;
+    color: #0A174E;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+
+  .prayCount {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #FFD966;
+    color: #0A174E;
+    padding: 3px 8px;
+    border-radius: 50%;
+    font-weight: bold;
+  }
+
+  #map {
+    width: 90%;
+    height: 500px;
+    margin-bottom: 50px;
+    border-radius: 12px;
+  }
+
+  @media(max-width:600px){
+    #map { height: 300px; }
+  }
+</style>
+
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src=https://unpkg.com/leaflet@1.9.4/dist/leaflet.js></script>
+
+</head>
+<body>
+
+<a href="welcome.html" style="
+  display: inline-block;
+  margin: 20px 0 0 20px;
+  padding: 10px 24px;
+  background: #F5D042;
+  color: #0A174E;
+  border-radius: 8px;
+  font-weight: bold;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: background 0.2s, color 0.2s;
+" onmouseover="this.style.background='#FFD966';this.style.color='#0A174E'" onmouseout="this.style.background='#F5D042';this.style.color='#0A174E'">
+  ← Back to Home
+</a>
+
+<h1>Prayer Wall</h1>
+<details><summary>Read more about💫Prayer Wall</summary>
+<h3><dl><strong>💫Prayer Wall:</strong></dl>is a way for believers to connect and support one another through faith. On this prayer wall, you can share your heart with God by adding your own prayer request, including your name, country, and state. Once added, your prayer appears as a pin on the map, letting others see it and lift it up in prayer.
+
+Each prayer request has a “Pray” button attached. When you pray for someone, click this button to let your brother or sister know that you are praying for them. It’s a simple but powerful way to encourage each other and grow in faith together.<strong>(James 5:16)</strong><ol>We encourage everyone to:</ol><li>
+  Add your own prayer requests and trust God with them.🫂,</li><li><strong>Pray for others by clicking the “Pray” button, showing care and unity in the body of Christ.🔥</strong></li><ol>Together, this wall creates a global community of believers, united in prayer and support.🤝</ol></h3>
+</details>
+<form id="prayerForm">
+  <input type="text" id="name" placeholder="Your Name">
+  <input type="text" id="location" placeholder="Location (city/country)">
+  <textarea id="prayer" placeholder="Your Prayer Request"></textarea>
+  <button type="submit">Submit Prayer</button>
+</form>
+
+<div id="prayerWall"></div>
+<div id="map"></div>
+
+<script>
+  // ===== Firebase Config =====
+const firebaseConfig = {
+   apiKey: "AIzaSyCcJGam-IorctNu7gVH-ULfi6AwBApgK1k",
+    authDomain: "the-gyn-fellowship.firebaseapp.com",
+    databaseURL: "https://the-gyn-fellowship-default-rtdb.firebaseio.com",
+    projectId: "the-gyn-fellowship",
+    storageBucket: "the-gyn-fellowship.appspot.com",
+    messagingSenderId: "834036869939",
+    appId: "1:834036869939:web:7260ba0db00ae86a5fac46"
+  };
+
+ const app = firebase.initializeApp(firebaseConfig);
+ const  database = firebase.database();
+  const  prayersRef = database.ref('prayers');
+
+ const  prayerForm = document.getElementById('prayerForm');
+  const  prayerWall = document.getElementById('prayerWall');
+
+  // ===== Leaflet Map =====
+const  map = L.map('map').setView([6.4281, -9.4295], 6);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    Attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+ const  markers = {};
+
+  // ===== Geocode function =====
+  async function getCoordinates(location) {
+    try {
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`);
+      const data = await response.json();
+      if(data && data.length > 0){
+        return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+      }
+    } catch(e){
+      console.error('Geocoding error:', e);
+    }
+    return [0,0];
+  }
+
+  // ===== Listen for new prayers =====
+ prayersRef.on('child_added', snapshot => {
+  const prayerObj = snapshot.val();
+
+  // Check if older than 7 days (604800000 ms)
+  const oneWeek = 7 * 24 * 60 * 60 * 1000;
+  if (Date.now() - (prayerObj.timestamp || 0) > oneWeek) {
+    // Delete expired prayer
+    prayersRef.child(snapshot.key).remove();
+    return;
+  }
+
+  addPrayerCard(snapshot.key, prayerObj);
+});
+
+
+  // ===== Submit new prayer =====
+  prayerForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const name = document.getElementById('name').value || "Anonymous";
+    const location = document.getElementById('location').value || "Unknown";
+    const text = document.getElementById('prayer').value.trim();
+
+    if(!text) {
+      alert('Please enter your prayer request!');
+      return;
+    }
+
+    prayersRef.push({ 
+  name, 
+  location, 
+  text, 
+  count: 0, 
+  timestamp: Date.now() 
+});
+
+    prayerForm.reset();
+  });
+
+// ===== Add prayer card & map marker =====
+async function addPrayerCard(key, p){
+  const card = document.createElement('div');
+  card.className = 'prayerCard';
+  card.id = key;
+  card.innerHTML = `
+    <div class="prayCount">${p.count}</div>
+    <strong>${p.name}</strong> - <em>${p.location}</em>
+    <p>${p.text}</p>
+    <button class="prayBtn">Pray 🙏</button>
+  `;
+  prayerWall.appendChild(card);
+
+  const prayBtn = card.querySelector('.prayBtn');
+
+  // Disable button if already prayed before
+  if(localStorage.getItem(`prayed_${key}`)){
+    prayBtn.disabled = true;
+    prayBtn.textContent = "Prayed 🙏";
+  }
+
+  prayBtn.addEventListener('click', () => {
+    // Prevent multiple clicks by same user
+    if(localStorage.getItem(`prayed_${key}`)){
+      alert("You have already prayed for this request 🙏");
+      return;
+    }
+
+    prayersRef.child(key).child('count').transaction(current => (current || 0) + 1);
+
+    // Store in localStorage so this user can’t pray again
+    localStorage.setItem(`prayed_${key}`, true);
+
+    // Update button state
+    prayBtn.disabled = true;
+    prayBtn.textContent = "Prayed 🙏";
+  });
+
+  // Add map marker
+  const coords = await getCoordinates(p.location);
+  const marker = L.marker(coords).addTo(map)
+    .bindPopup(`<strong>${p.name}</strong><br>${p.text}<br>🙏 ${p.count}`);
+  markers[key] = marker;
+}
+
+  // ===== Update marker & card counts =====
+  prayersRef.on('child_changed', snapshot => {
+    const updatedPrayer = snapshot.val();
+    const card = document.getElementById(snapshot.key);
+    if(card) card.querySelector('.prayCount').textContent = updatedPrayer.count;
+    if(markers[snapshot.key]){
+      markers[snapshot.key].setPopupContent(`<strong>${updatedPrayer.name}</strong><br>${updatedPrayer.text}<br>🙏 ${updatedPrayer.count}`);
+    }
+  });
+</script>
+
+</body>
+</html>
+

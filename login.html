@@ -1,0 +1,226 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fellowship Login</title>
+<style>
+  /* Full page with background image */
+  body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: url('james.jpg') no-repeat center center/cover;
+    position: relative;
+    font-family: Arial, sans-serif;
+  }
+
+  /* Dark overlay for readability */
+  body::before {
+    content: "";
+    position: absolute;
+    top:0; left:0; right:0; bottom:0;
+    background: rgba(0,0,0,0.4);
+    z-index: 0;
+  }
+
+  /* Glass container */
+  .glass-container {
+    position: relative;
+    z-index: 1;
+    width: 350px;
+    padding: 2rem;
+    border-radius: 15px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    text-align: center;
+    color: #fff;
+  }
+
+  h2 {
+    margin-bottom: 1rem;
+    color: #F5D042;
+  }
+
+  input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 8px;
+    outline: none;
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+  }
+
+  input::placeholder { color: #ddd; }
+
+  button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    background: #0A174E;
+    color: #F5D042;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+
+  button:hover { background: #132a94; }
+
+  p { margin-top: 15px; font-size: 14px; }
+  a { color: #F5D042; cursor: pointer; text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="glass-container">
+  <h2>Fellowship Login</h2>
+  <input type="text" id="name" placeholder="Your Name (Sign Up only)">
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
+  <button onclick="signup()">Sign Up</button>
+  <button onclick="login()">Login</button>
+  <p id="message"></p>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"></script>
+
+<script>
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyCcJGam-IorctNu7gVH-ULfi6AwBApgK1k",
+    authDomain: "the-gyn-fellowship.firebaseapp.com",
+    databaseURL: "https://the-gyn-fellowship-default-rtdb.firebaseio.com",
+    projectId: "the-gyn-fellowship",
+    storageBucket: "the-gyn-fellowship.firebasestorage.app",
+    messagingSenderId: "834036869939",
+    appId: "1:834036869939:web:7260ba0db00ae86a5fac46"
+  };
+
+  const app = firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.database();
+
+  // Sign Up
+  function signup() {
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    if(!name || !email || !password){
+      document.getElementById("message").innerText = "Please fill all the fields!";
+      return;
+    }
+
+    auth.createUserWithEmailAndPassword(email, password)
+      .then(userCred => {
+        const user = userCred.user;
+        // Save user info in database
+        db.ref("users/" + user.uid).set({name, email, uid: user.uid});
+        // Save in localStorage for transfer across pages
+        localStorage.setItem("userName", name);
+        localStorage.setItem("userEmail", email);
+        localStorage.setItem("userUID", user.uid);
+        document.getElementById("message").innerText = "Sign Up Successful 🎉";
+        window.location.href = "welcome.html"; // redirect to your home page
+      })
+      .catch(err => document.getElementById("message").innerText = err.message);
+  }
+
+  // Login
+  function login() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    auth.signInWithEmailAndPassword(email, password)
+      .then(userCred => {
+        const user = userCred.user;
+        db.ref("users/" + user.uid).once("value").then(snapshot => {
+          const data = snapshot.val();
+          localStorage.setItem("userName", data.name);
+          localStorage.setItem("userEmail", data.email);
+          localStorage.setItem("userUID", data.uid);
+          document.getElementById("message").innerText = "Login Successful ✅";
+          window.location.href = "welcome.html";
+        });
+      })
+      .catch(err => document.getElementById("message").innerText = err.message);
+  }
+
+  // Auto-login if user already signed in
+  window.onload = () => {
+    auth.onAuthStateChanged(user => {
+      if(user){
+        db.ref("users/" + user.uid).once("value").then(snapshot => {
+          const data = snapshot.val();
+          localStorage.setItem("userName", data.name);
+          localStorage.setItem("userEmail", data.email);
+          localStorage.setItem("userUID", data.uid);
+          window.location.href = "";
+        });
+      }
+    });
+  }
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html>
+    <head><link rel="stylesheet" href="style.css">
+        <script
+        src="https://cdn.emailjs.com/dist/email.min.js"></script>
+        <script>(function()
+        {emailjs.init("C0xCrn5piiGH77q1e")});</script>
+ </head>
+<body>
+    <div class="wrapper">
+        <h1>LOGIN</h1>
+        <form action="" id="loginForm">
+            
+            <div class="input-box">
+            <input type="text" placeholder="Username" required />
+            <i class="bx bxs-user"></i>
+            </div>
+            <div class="input-box">
+                <input type="password" placeholder="Password" required />
+                <i class="bx bxs-lock-alt"></i>
+            </div>
+       <div class="remember-forgot">
+        <label><input type="checkbox">Remember me </label>
+       <a href="#">Forgot Password</a>
+    </div>
+      <button type="submit" class="btn">Login</button>
+      <div class="register-link">
+        <p>Don't have an account? <a href="create new account.html" >Register</a></p>
+      </div>
+</form>
+
+    </div>
+<script src="script.js" ></script>   
+</body>

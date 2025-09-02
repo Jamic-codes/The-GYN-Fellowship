@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Youth Fellowship Website</title>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #0A174E, #1D2D6B);
+    color: #fff;
+    display: flex;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Side Menu */
+  .side-menu {
+    width: 200px;
+    background-color: #0A174E;
+    display: flex;
+    flex-direction: column;
+    padding-top: 20px;
+    z-index: 10;
+  }
+
+  .side-menu a {
+    padding: 15px 20px;
+    text-decoration: none;
+    color: #F5D042;
+    font-weight: bold;
+    transition: background 0.3s;
+  }
+
+  .side-menu a:hover {
+    background: #1D2D6B;
+  }
+
+  /* Main Content */
+  #mainContent {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Pages */
+  .page {
+    display: none;
+  }
+  .page.active {
+    display: block;
+  }
+
+  /* Chatroom panel */
+  #chatroomPanel {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 400px;
+    max-width: 100%;
+    height: 80%;
+    background: #0A174E;
+    padding: 20px;
+    box-shadow: -4px 0 10px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    transition: right 0.5s ease;
+    z-index: 20;
+  }
+
+  #chatroomPanel.active {
+    right: 0;
+  }
+
+  #chatHeader {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    text-align: center;
+    padding: 10px;
+    background: linear-gradient(90deg, #F5D042, #FFD966);
+    color: #0A174E;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  }
+
+  #roomSelect {
+    width: 80%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: none;
+    font-weight: bold;
+  }
+
+  #messages {
+    flex: 1;
+    background: rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 15px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+  }
+
+  .message {
+    margin-bottom: 10px;
+  }
+
+  .message strong {
+    color: #F5D042;
+  }
+
+  .message span {
+    font-size: 0.8em;
+    color: #ddd;
+    margin-left: 5px;
+  }
+
+  #inputContainer {
+    display: flex;
+    gap: 10px;
+  }
+
+  #username, #messageInput {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    flex: 1;
+  }
+
+  #username {
+    max-width: 120px;
+  }
+
+  #sendBtn {
+    padding: 10px 20px;
+    background: #F5D042;
+    color: #0A174E;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  #sendBtn:hover {
+    background: #FFD966;
+  }
+
+  @media screen and (max-width: 768px) {
+    .side-menu {
+      width: 100%;
+      flex-direction: row;
+      overflow-x: auto;
+    }
+    #mainContent {
+      padding: 10px;
+    }
+    #chatroomPanel {
+      width: 100%;
+    }
+  }
+  .chatroomWarning{
+    Background: 
+  rgba(255,255,255,0.1);
+  Backdrop-filter: blur(8px);
+  Border-radius:15px;
+  Padding: 20px;
+  Margin: 20px auto;
+  Max-width: 800px;
+  Text-align: center;
+  Color: #F5D042;
+  Font-family: Arial, sans-serif;
+  Border: 2px solid #F5D042;
+  }
+  .chatInputSection{
+    text-align:center; 
+    margin-top:20px;
+     padding:10px; 
+     width:80%; 
+         max-width:500px; 
+         border-radius:8px; 
+         border:1px solid #F5D042;
+          background:rgba(255,255,255,0.1); color:#fff;
+  }
+  .disabledbtn{
+padding:10px 20px; 
+  margin-left:10px; 
+  border-radius:8px; 
+  border:none;
+   background:#F5D042; 
+   color:#0A174E; 
+   font-weight:bold; cursor:not-allowed;
+  }
+  .center-box{
+    width: 300px;
+    padding: 20px;
+    margin: 50px auto;
+    text-align: center;
+    background: rgba(10, 23, 78, 0.8);
+    color: #F5d042;
+    border-radius: 15px;
+    border: 2px solid #F5d042;
+    backdrop-filter: blur(8px);
+    font-size: 18px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+</style>
+</head>
+<body>
+
+<!-- Side Menu -->
+<div class="side-menu">
+  <a href="welcome.html" onclick="showPage('home')">Home</a>
+  <a href="calendar Events.html" onclick="showPage('events')">Events</a>
+  <a href="stories.html" onclick="showPage('testimonies')">Testimonies</a>
+  <a href="bible Quiz.html" onclick="showPage('quiz')">Bible Quiz</a>
+  <a href="#" onclick="toggleChatroom()">Chatroom</a>
+  <a href="my contacts.html" onclick="showPage('contact')">Contact</a>
+  <a href="Gallery.html" onclick="showPage('Gallery')">Gallery</a>
+  <a href="prayer wall.html" onclick="showPage('prayerWall')">PrayerWall</a>
+</div>
+<!—Chatroom Warning Section 
+<div id=”chatroomWarning” >
+
+ 
+
+  <div style="margin-top:40px;">
+        <label for="social-select" style="color:#f7c873; font-weight:bold;">Select your prefer platform  (optional):</label>
+        <select id="social-select" onchange="openSocialLink(this.value)" style="margin-left:8px; padding:6px 12px; border-radius:8px; border:1px solid #f7c873;">
+          <option value="">-- Select Platform --</option>
+          <option value="https://m.me/thegospelyouneed">Messenger</option>
+          <option value="https://www.tiktok.com/@thegynfellowship">TikTok</option>
+          <option value="https://wa.me/231777769830">WhatsApp</option>
+        </select>
+ 
+         
+  
+   
+</div>
+<div class="center-box"><h1>Welcome to the GYN Chatroom</h1><h2>Notice 📢</h2>
+  <p>
+    Chatting here is currently disabled.  
+    But you can join our groups on WhatsApp, Messenger or even Tiktok(To join our live video)for real-time fellowship and discussions!</p></div>
+
+<!-- Main Content -->
+<div id="mainContent">
+  <div id="home" class="page active">
+    
+   
+  </div>
+
+  <div id="events" class="page">
+    <h1>Events</h1>
+    <p style="text-align:center;">Events content goes here...</p>
+  </div>
+
+  <div id="testimonies" class="page">
+    <h1>Testimonies & Stories</h1>
+    <p style="text-align:center;">Testimonies content goes here...</p>
+  </div>
+
+  <div id="quiz" class="page">
+    <h1>Bible Quiz</h1>
+    <p style="text-align:center;">Bible Quiz content goes here...</p>
+  </div>
+
+  <div id="contact" class="page">
+    <h1>Contact</h1>
+    <p style="text-align:center;">Contact content goes here...</p>
+  </div>
+</div>
+
+<!-- Chatroom Panel -->
+<div id="chatroomPanel">
+  <div id="chatHeader">Fellowship Chatroom</div>
+  <select id="roomSelect">
+    <option value="PrayerRequests">Prayer Requests</option>
+    <option value="BibleStudy">Bible Study</option>
+    <option value="GeneralFellowship">General Fellowship</option>
+  </select>
+  <div id="messages"></div>
+  <div id="inputContainer">
+    <input type="text" id="username" placeholder="Your name">
+    <input type="text" id="messageInput" placeholder="Type your message...">
+    <button id="sendBtn" onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<script>
+  // Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyCcJGam-IorctNu7gVH-ULfi6AwBApgK1k",
+    authDomain: "the-gyn-fellowship.firebaseapp.com",
+    databaseURL: "https://the-gyn-fellowship-default-rtdb.firebaseio.com",
+    projectId: "the-gyn-fellowship",
+    storageBucket: "the-gyn-fellowship.firebasestorage.app",
+    messagingSenderId: "834036869939",
+    appId: "1:834036869939:web:7260ba0db00ae86a5fac46"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  // Page switching
+  function showPage(pageId){
+    const pages = document.querySelectorAll('.page');
+    pages.forEach(page => page.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+    // hide chatroom if open
+    document.getElementById('chatroomPanel').classList.remove('active');
+  }
+
+  // Toggle chatroom slide-in
+  function toggleChatroom(){
+    const panel = document.getElementById('chatroomPanel');
+    panel.classList.toggle('active');
+  }
+  //Optional JS to ensure chatbox is always disabled 
+  const input = document.querySelector('#chatInputSection input');
+ const button = document.querySelector('#chatInputSection button');
+  Input.disabled = true;
+  Button.disabled = true;
+
+  // Chatroom functions
+  function sendMessage(){
+    const room = document.getElementById("roomSelect").value;
+    const username = document.getElementById("username").value.trim();
+    const message = document.getElementById("messageInput").value.trim();
+    if(!username || !message) return alert("Enter your name and message.");
+
+    const msgData = {
+      username,
+      message,
+      timestamp: new Date().toLocaleTimeString()
+    };
+    db.ref('chatrooms/'+room).push(msgData);
+    document.getElementById("messageInput").value = "";
+  }
+  // Social Media Selector Logic
+    function openSocialLink(url) {
+      if (url) {
+        window.open(url, '_blank');
+        document.getElementById('social-select').selectedIndex = 0;
+      }
+    }
+
+
+  function loadMessages(){
+    const roomSelect = document.getElementById("roomSelect");
+    const messagesDiv = document.getElementById("messages");
+const instructions = {
+    "PrayerRequests": "Please share your prayer requests here.",
+    "BibleStudy": "Discuss Bible study topics here.",
+    "GeneralFellowship": "Chat freely with fellow members."
+  };
+    function updateRoom(){
+      const room = roomSelect.value;
+      messagesDiv.innerHTML = "";
+      db.ref('chatrooms/'+room).off(); // remove old listener
+      db.ref('chatrooms/'+room).on('child_added', snapshot => {
+        const msg = snapshot.val();
+        const div = document.createElement("div");
+        div.classList.add("message");
+        div.innerHTML = `<strong>${msg.username}:</strong> ${msg.message} <span>(${msg.timestamp})</span>`;
+        messagesDiv.appendChild(div);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      });
+    }
+
+    roomSelect.addEventListener("change", updateRoom);
+    updateRoom();
+  }
+
+  window.onload = loadMessages;
+</script>
+</body>
+</html>

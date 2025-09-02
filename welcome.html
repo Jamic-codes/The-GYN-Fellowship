@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>THE GYN FELLOWSHIP</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+ 
+
+  <style>
+    /* Card segment styles for main sections */
+    .segment {
+      background: rgba(34, 34, 34, 0.85);
+      border-radius: 24px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+      padding: 40px 24px;
+      margin: 32px 0;
+      width: 90vw;
+      max-width: 600px;
+      min-width: 280px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: box-shadow 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .segment-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.18;
+      z-index: 0;
+      border-radius: 24px;
+      pointer-events: none;
+    }
+    .segment > *:not(.segment-bg) {
+      position: relative;
+      z-index: 1;
+    }
+    .segment:hover {
+      box-shadow: 0 8px 32px rgba(247,200,115,0.18);
+    }
+    .about img {
+      border-radius: 16px;
+      margin-bottom: 18px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+      max-width: 100%;
+      height: auto;
+    }
+    .features {
+      display: flex;
+      gap: 32px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+    .features > div {
+      background: rgba(247,200,115,0.08);
+      border-radius: 12px;
+      padding: 18px 14px;
+      min-width: 180px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.10);
+    }
+    @media (max-width: 600px) {
+      .segment { padding: 18px 6px; }
+      .features { gap: 12px; }
+      .features > div { min-width: 120px; padding: 10px 6px; }
+    }
+    body {
+      position: relative;
+      min-height: 100vh;
+      font-family: 'Roboto', 'Segoe UI', 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    .bg-blur {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      background: url('james.jpg') no-repeat center center/cover;
+      filter: blur(8px) brightness(0.7);
+    }
+    /* Ensure content is readable above the blur */
+    .content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+    }
+    header, .hero, .about, .quote-section, .contact-form {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto 30px auto;
+      text-align: center;
+    }
+    h1, h2, h3, h4 {
+      font-family: 'Brush Script MT', 'Brush Script MT' 'Roboto', sans-serif;
+      color: #f7c873;
+      font-weight: 700;
+      margin-bottom: 18px;
+      letter-spacing: 2px;
+    }
+    h1 {
+      font-size: 3rem;
+      color: #f7c873;
+      text-shadow: 2px 2px 8px #222;
+    }
+    h2 {
+      font-size: 2.2rem;
+      color: #f7c873;
+      text-shadow: 1px 1px 6px #222;
+    }
+    h3 {
+      font-size: 1.7rem;
+      color: #fffbe6;
+      text-shadow: 1px 1px 4px #222;
+    }
+    h4 {
+      font-size: 1.3rem;
+      color: #f7c873;
+    }
+    p,li, em, blockquote {
+      font-size: 1.25rem, 1.40rem;
+      color: #f3f3f3;
+      font-family: 'Roboto', 'Segoe UI', 'Arial', sans-serif;
+      margin-bottom: 16px;
+      line-height: 1.7;
+      text-shadow: 1px 1px 4px #222;
+      
+    }
+    
+
+    blockquote {
+      font-size: 1.4rem;
+      font-style: italic;
+      color: #ffe4b5;
+      border-left: 4px solid #f7c873;
+      padding-left: 16px;
+      margin: 20px 0;
+    }
+    .features strong {
+      color: #f7c873;
+      font-size: 1.2rem;
+      font-family: 'Segoe Script', cursive;
+    }
+    .features p {
+      color: #fff;
+      font-size: 1.25rem;
+    }
+    .btn {
+      background: linear-gradient(90deg, #f7c873 0%, #f7b267 100%);
+      color: #222;
+      font-size: 1.2rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 25px;
+      padding: 12px 32px;
+      margin: 10px 0;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      transition: background 0.3s, color 0.3s;
+    }
+    .btn:hover {
+      background: linear-gradient(90deg, #f7b267 0%, #f7c873 100%);
+      color: #fff;
+    }
+    input, textarea {
+      width: 80%;
+      max-width: 400px;
+      padding: 10px;
+      margin: 8px auto;
+      border-radius: 8px;
+      border: 1px solid #f7c873;
+      font-size: 1.1rem;
+      background: rgba(255,255,255,0.8);
+      color: #222;
+      display: block;
+    }
+    @media (max-width: 600px) {
+      h1 { font-size: 2.1rem; }
+      h2 { font-size: 1.5rem; }
+      h3 { font-size: 1.2rem; }
+      p, em, blockquote { font-size: 1rem; }
+      .btn { font-size: 1rem; padding: 10px 18px; }
+    }
+    /* Optionally, add a semi-transparent overlay for more contrast */
+    .bg-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.3);
+      z-index: 0;
+    }
+     nav {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: space-around;
+      
+      padding: 1rem;
+      color: #F5D042;
+      backdrop-filter: blur(8px);
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+    }
+    nav a {
+      color: #F5D042;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.2s;
+    }
+    nav a:hover {
+      text-decoration: underline;
+      color: #fffbe6;
+    }
+    /* ...existing CSS... */
+  </style>
+</head>
+
+<body>
+  <div class="bg-blur"></div>
+  <div class="bg-overlay"></div>
+  <div class="content">
+    <header>
+      <div>
+       <h1>The GYN Fellowship</h1>
+      </div>
+      <br>
+      <h3><strong>Front Street</strong><ul>Monrovia, Liberia</ul></h3>
+      <div class="menu-toggle" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span> 
+      </div>
+      <nav>
+         <a href="stories.html">Testimonies & Stories</a>
+        <a href="bible Quiz.html"> Quiz Game</a>
+        <a href="calendar Events.html">Events Cal</a>
+        <a href="chatroom.html">Chatroom Path</a>
+        <a href="prayer wall.html">Intercessory PrayerWall</a>
+        <a href="gallery-static.html">Photo Gallery</a>
+        <a href="my contacts.html">Our contacts</a>
+      <a href="bible note.html">Notes</a>
+        <button class="btn">Donate</button>
+      </nav>
+    </header>
+
+    <!-- Donation Modal -->
+    <div id="donateModal" class="modal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;">
+      <div style="background:#222; color:#fff; border-radius:18px; padding:32px 24px; max-width:350px; width:90vw; box-shadow:0 4px 24px #000; position:relative; text-align:center;">
+        <span onclick="closeDonateModal()" style="position:absolute; top:10px; right:18px; font-size:1.5rem; cursor:pointer; color:#f7c873;">&times;</span>
+        <h2 style="color:#f7c873;">Support Our Fellowship</h2>
+        <p style="margin-bottom:10px;">To donate, please use any of the following mobile numbers:</p>
+        <div style="margin-bottom:10px;">
+          <strong>Orange Money:</strong> <span style="color:#f7c873;">0777287386</span><br>
+          <strong>MTN Mobile Money:</strong> <span style="color:#f7c873;">0886364778</span>
+        </div>
+        <p>Thank you for your generosity!</p>
+      </div>
+    </div>
+
+
+    <section class="hero segment">
+      <img src="IMG-20250123-WA0002.jpg" alt="Hero Background" class="segment-bg" />
+      <h3 id="welcome-message">JESUS MUST BE KNOWN</h3>
+      <h1>GOD GIVES US POWER</h1>
+      <p>1 JOHN 1:7 "BUT IF WE WALK IN THE LIGHT,
+        AS HE IS IN THE LIGHT, WE HAVE FELLOWSHIP WITH ONE ANOTHER, AND THE BLOOD OF 
+        JESUS CHRIST HIS SON CLEANSE US FROM ALL SINS"
+      </p>
+    
+    </section>
+
+    <section class="events segment" id="events">
+      <img src="IMG-20250123-WA0007.jpg" alt="Events Background" class="segment-bg" />
+      
+  <h2>✨ Vision Statement</h2>
+<p>“To see a generation of youth transformed into true disciples of Jesus Christ—living out His Word, growing in maturity, and making more disciples in every sphere of life.”</p>
+
+
+
+<h2>✨ Mission Statement</h2>
+
+<p>“Our mission is to disciple young people in the way of Christ through intentional teaching, mentorship, and practical ministry. We are committed to equipping youth with biblical truth, nurturing them in prayer and fellowship, and empowering them to live as Christ’s witnesses—multiplying disciples in their schools, families, communities, and beyond.”</p>
+
+
+
+<h2>✨ Core Values</h2>
+
+<li>1.	Christ-Centered Living – We put Jesus at the center of everything we do.</li>
+
+
+<li>2.	Obedience to the Word – We live by Scripture as our ultimate authority.</li>
+
+
+<li>3.	Prayer & Worship – We seek God’s presence daily in prayer, worship, and devotion.</li>
+
+
+<li>4.	Fellowship & Unity – We walk together in love, accountability, and encouragement.</li>
+
+
+<li>5.	Discipleship & Mentorship – We commit to growing and guiding others in the faith.</li>
+
+
+<li>6.	Evangelism & Service – We share the gospel and serve our communities with compassion.</li>
+
+
+ <li>7.Integrity & Holiness – We strive to reflect Christ in character and lifestyle.🔥</li>
+
+
+
+
+
+
+
+
+    </section>
+
+    <section class="about segment">
+      <img src="IMG-20250123-WA0008.jpg" alt="About Background" class="segment-bg" />
+      <div class="about-text">
+        <h2>ABOUT US</h2>
+        <h3>The vision for our Gospel FELLOWSHIP was born from a deep hunger for authentic Christain community
+ rooted in the truth of God's word and the power of the holy spirit. in a time when many were searching  
+for meaning,connection,and spiritual depth, a few believers began to gather with a shared conviction: to 
+return to the simplicity and strength of the early church-devoted to the apostles' teaching, to
+the studying of the word(HOLY BIBLE), and to prayer.
+What began as a small prayer group in living rooms soon grew into a vibrant fellowship centered on the 
+gospel of Jesus Christ, The foundation is clear:JESUS IS THE ONLY WAY,THE TRUTH,AND THE LIFE(John 14:6),
+and the message of his death and burial,and ressurection is the power of God unto salvation for everyone who
+ believes (Romans 1:16).</h3>
+        <p>We welcome you with great joy to THE GYN FELLOWSHIP. We are here to share the great news of Jesus Christ to all that will listen.</p>
+        <p><em>"The name of the Lord is a strong tower, the righteous run into it and are safe."</em></p>
+        <div class="features">
+          <div>
+            <strong>Place Of Heaven</strong>
+            <p>In this fellowship you will feel loved,respected valued,honored and trusted.</p>
+          </div>
+          <div>
+            <strong>Study Bible</strong>
+            <p>Learn the Bible, enhance your wisdom, give you boldness about your faith,
+                becaue that's what growth is all about.
+            </p>
+          </div>
+        </div>
+        <br>
+        <button class="btn"><a href="bible note.html">Learn More></a></button>
+      </div>
+    </section>
+
+    <section class="quote-section segment">
+      <img src="IMG-20250123-WA0009.jpg" alt="Quote Background" class="segment-bg"/>
+      <blockquote>
+        “In here we PRAY!,TRUST,and OBEY”
+      </blockquote>
+      <p>The establishment of the fellowship was marked not by formality but by faith. There was no grand building
+or organizational structure in the begining-only hearts that burned for revival,truth,and holiness.
+Meetings were filled with heartfelt worship, in-depth Bible study,and honest sharing of burdens.Lives were 
+changed,and spiritual growth became common.
+As more peope joined, the fellowship began to formalize under spiritual leadership that was both humble and 
+biblically sound. Core values were set: CHRIST-CENTERED TEACHING,SPIRIT-LED WORSHIP,MUTUAL ACCOUNTABILITY,
+</p>
+
+    </section>
+
+    <section class="contact-form segment">
+      <img src="IMG-20250123-WA0011.jpg" alt="Contact Background" class="segment-bg"/>
+      <h2>Contact Us</h2>
+  <form id="contact-form">
+        <input type="text" name="from_name" placeholder="Your Name" required>
+        <input type="email" name="from_email" placeholder="Your Email" required>
+        <textarea name="message" rows="4" placeholder="Your Message" required></textarea>
+        <br>
+        <button class="btn" type="submit">Send Message</button>
+      </form>
+      <p id="form-status" style="margin-top:10px;"></p>
+      
+<div id="formModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center;">
+  <div style="background:#fff; padding:20px; border-radius:10px; max-width:400px; text-align:center; box-shadow:0 4px 8px rgba(0,0,0,0.3);">
+    <p id="formModalMessage" style="margin-bottom:15px;"></p>
+    <button id="closeModal" style="padding:8px 16px; background:#0A174E; color:#fff; border:none; border-radius:5px; cursor:pointer;">OK</button>
+  </div>
+</div>
+
+      <!-- Optional Social Media Selectors -->
+      <div style="margin-top:18px;">
+        <label for="social-select" style="color:#f7c873; font-weight:bold;">Connect with us if you're interested (optional):</label>
+        <select id="social-select" onchange="openSocialLink(this.value)" style="margin-left:8px; padding:6px 12px; border-radius:8px; border:1px solid #f7c873;">
+          <option value="">-- Select Platform --</option>
+          <option value="https://www.facebook.com/The Gospel You Need">Facebook</option>
+          <option value="https://www.tiktok.com/@The GYN FELLOWSHIP">TikTok</option>
+          <option value="https://www.instagram.com/the GYN">Instagram</option>
+          <option value="https://wa.me/231777769830">WhatsApp</option>
+        </select>
+      </div>
+    </section>
+
+    <button id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+  </div>
+
+  <script>
+    // Welcome User by Name (assumes username is passed via query string, e.g., home.html?user=James)
+    const urlParams = new URLSearchParams(window.location.search);
+    const username = urlParams.get("user");
+    if (username) {
+      const welcome = document.getElementById("welcome-message");
+      welcome.innerText = `Welcome, ${username}!`;
+    }
+
+    // Social Media Selector Logic
+    function openSocialLink(url) {
+      if (url) {
+        window.open(url, '_blank');
+        document.getElementById('social-select').selectedIndex = 0;
+      }
+    }
+
+    // Donate Modal Logic
+    const donateBtn = document.querySelector('nav .btn');
+    const donateModal = document.getElementById('donateModal');
+    if (donateBtn && donateModal) {
+      donateBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        donateModal.style.display = 'flex';
+      });
+    }
+    function closeDonateModal() {
+      donateModal.style.display = 'none';
+    }
+    // Close modal when clicking outside the modal content
+    window.addEventListener('click', function(event) {
+      if (event.target === donateModal) {
+        donateModal.style.display = 'none';
+      }
+    });
+
+    // Dynamic Events
+    
+  // const eventsContainer = document.getElementById('events');
+  // events.forEach(event => {
+  //   const card = document.createElement('div');
+  //   card.className = 'event-card';
+  //   card.innerHTML = `
+  //     <h4>${event.date}</h4>
+  //     <p>${event.title}</p>
+  //     <span>${event.time}</span>
+  //     <p><a href="">Event Details</a></p>
+  //   `;
+  //   eventsContainer.appendChild(card);
+  // });
+
+    // Toggle Menu
+    function toggleMenu() {
+      const nav = document.getElementById('navLinks');
+      nav.classList.toggle('show');
+    }
+
+    // Scroll to Top
+    const scrollBtn = document.getElementById('scrollTopBtn');
+    window.onscroll = () => {
+      scrollBtn.style.display = window.scrollY > 200 ? 'block' : 'none';
+    };
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Contact Form Submission using fetch to backend
+    document.getElementById("contact-form").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const modal = document.getElementById("formModal");
+      const modalMessage = document.getElementById("formModalMessage");
+      const closeModal = document.getElementById("closeModal");
+      const form = this;
+      const formData = {
+        from_name: form.from_name.value,
+        from_email: form.from_email.value,
+        message: form.message.value
+      };
+      try {
+        const res = await fetch('http://localhost:3000/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        const text = await res.text();
+        if (res.ok) {
+          modalMessage.innerText = text;
+          modalMessage.style.color = "green";
+        } else {
+          modalMessage.innerText = text || "❌ Error sending message. Please try again.";
+          modalMessage.style.color = "red";
+        }
+        modal.style.display = "flex";
+      } catch (error) {
+        modalMessage.innerText = "❌ Error sending message. Please try again.";
+        modalMessage.style.color = "red";
+        modal.style.display = "flex";
+      }
+      form.reset();
+      // close modal button
+      closeModal.onclick = () => {
+        modal.style.display = "none";
+      };
+      // close if user clicks outside modal box
+      window.onclick = (event) => {
+        if (event.target === modal) {
+          modal.style.display = "none";
+        }
+      };
+    });
+
+  </script>
+</body>
+</html>
+

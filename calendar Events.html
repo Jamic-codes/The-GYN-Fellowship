@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<section id="events">
+</head>
+<body>
+  <h2>📅 Our Fellowship Events</h2>
+
+  <div class="calendar-wrapper">
+    <div class="calendar-card">
+      <!-- View Toggle -->
+      <div class="calendar-top">
+        <div class="calendar-toggle">
+          <button data-view="week"  onclick="setView('week')">Week</button>
+          <button data-view="month" onclick="setView('month')" class="active">Month</button>
+          <button data-view="year"  onclick="setView('year')">Year</button>
+        </div>
+
+        <!-- Adaptive Navigation -->
+        <div class="calendar-nav">
+          <button onclick="changePeriod(-1)">&#8592; Prev</button>
+          <span id="period-label"></span>
+          <button onclick="changePeriod(1)">Next &#8594;</button>
+        </div>
+      </div>
+
+      <!-- Calendar Grid -->
+      <div class="calendar-grid" id="calendar"></div>
+
+      <!-- Casual Updates -->
+      <div id="event-details">
+        <h3>Upcoming & Casual Updates</h3>
+        <ul id="event-list"></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Modal -->
+<div id="event-modal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <h3 id="modal-date"></h3>
+    <ul id="modal-events"></ul>
+  </div>
+</div>
+
+<style>
+  body{
+    background: linear-gradient(135deg, #0a174e, #f5d042);
+  }
+  h2{
+    text-align: center;
+      padding: 20px;
+      text-shadow: #0a174e;
+      color: #eee;
+      text-decoration: solid;
+      font-style: inherit;
+      
+  }
+  .calendar-wrapper{display:flex;justify-content:center;margin:20px 0;}
+  .calendar-card{
+    width:100%;max-width:900px;border-radius:16px;padding:20px;
+    background-image:url('public/james.jpg');
+    background-size:cover;background-position:center;
+    box-shadow:0 10px 28px rgba(0,0,0,.25);
+    position:relative;overflow:hidden;
+  }
+  .calendar-card::after{
+    content:"";position:absolute;inset:0;background:rgba(10,23,78,.35);z-index:0;
+  }
+  .calendar-top, .calendar-grid, #event-details { position:relative; z-index:1; }
+  .calendar-toggle{display:flex;gap:8px;flex-wrap:wrap}
+  .calendar-toggle button{
+    padding:8px 12px;border:none;border-radius:10px;cursor:pointer;
+    background:#0A174E;color:#fff;font-weight:600;transition:.2s;
+  }
+  .calendar-toggle button.active, .calendar-toggle button:hover{background:#F5D042;color:#0A174E}
+  .calendar-nav{margin-top:10px;display:flex;gap:10px;align-items:center}
+  .calendar-nav button{
+    padding:8px 12px;border:none;border-radius:10px;background:#0A174E;color:#fff;cursor:pointer;font-weight:600;
+  }
+  .calendar-nav button:hover{background:#F5D042;color:#0A174E}
+  #period-label{color:#fff;font-weight:700;font-size:18px;margin-left:auto;margin-right:auto}
+
+  .calendar-grid{display:grid;gap:6px;margin-top:14px}
+  /* Month grid */
+  .grid-month{grid-template-columns:repeat(7,1fr)}
+  .dow{background:rgba(10,23,78,.85);color:#fff;font-weight:700;text-align:center;padding:10px;border-radius:8px}
+  .day{
+    background:rgba(255,255,255,.95);border:1px solid #e8e8e8;border-radius:10px;
+    min-height:88px;padding:8px;position:relative;cursor:pointer;display:flex;flex-direction:column;gap:6px;
+    transition:.15s;
+  }
+  .day:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.12)}
+  .day .date{font-weight:800;color:#0A174E}
+  .day.muted{opacity:.45}
+  .day.today{outline:2px solid #F5D042}
+  .badge{display:inline-block;font-size:11px;line-height:1;border-radius:999px;padding:4px 8px;background:#F5D042;color:#0A174E;font-weight:700}
+  .dot{width:8px;height:8px;border-radius:50%;background:#0A174E;position:absolute;right:8px;bottom:8px}
+
+  /* Week grid */
+  .grid-week{grid-template-columns:repeat(7,1fr)}
+  .week-header{display:flex;gap:6px}
+  .week-cell{display:flex;flex-direction:column}
+  .week-label{background:rgba(10,23,78,.85);color:#fff;font-weight:700;border-radius:8px;padding:8px;text-align:center}
+  .week-box{background:rgba(255,255,255,.95);border:1px solid #e8e8e8;border-radius:10px;min-height:140px;padding:8px;position:relative}
+  .week-box.today{outline:2px solid #F5D042}
+
+  /* Year grid */
+  .grid-year{grid-template-columns:repeat(3,1fr)}
+  .month-card{
+    background:rgba(255,255,255,.96);border:1px solid #e8e8e8;border-radius:12px;padding:12px;min-height:200px;
+  }
+  .month-name{font-weight:900;color:#0A174E;margin-bottom:8px}
+  .mini-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+  .mini-cell{background:#fff;border:1px solid #eee;border-radius:6px;min-height:26px;font-size:12px;text-align:center;position:relative}
+  .mini-cell.event::after{content:"";width:6px;height:6px;border-radius:50%;background:#F5D042;position:absolute;right:4px;bottom:4px}
+
+  #event-details{background:rgba(255,255,255,.96);border-radius:12px;padding:14px;margin-top:16px}
+  #event-details h3{color:#0A174E;margin-top:0}
+  #event-list li{margin-bottom:6px}
+
+  /* Modal */
+  .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;align-items:center;justify-content:center}
+  .modal-content{background:rgba(255,255,255,.96);border-radius:12px;padding:18px;max-width:520px;width:92%;position:relative}
+  .close{position:absolute;right:12px;top:10px;font-size:22px;cursor:pointer}
+  #modal-date{font-weight:800;margin:4px 0 10px}ss
+  #modal-events li{margin:6px 0}
+</style>
+
+<script>
+  /* ====== SAMPLE EVENTS (edit freely) ====== */
+  // Allow multiple per day with title + optional time/desc
+  const EVENTS = {
+    "2025-08-21": [
+      { title: "Bible Study Night", time: "6:00 PM", desc: "Join us for fellowship & scripture." },
+      { title: "Youth Hangout", time: "4:00 PM" }
+    ],
+    "2025-08-22": [{ title: "Fellowship's Anniversary", time: "", desc: "If there would be a cellebration there will be updates" }],
+    "2025-09-01": [{ title: "Fasting & Prayer", time: "7:00 PM" }],
+    "2025-10-20": [{ title: "Wild Fire prayer summit", time: "12:00 PM" }],
+    "2025-10-12": [{ title: "Schools Outreach", time: "3:00 PM" }]
+  };
+
+  // Special update events (picnic, revival, etc.)
+  // SPECIAL_EVENTS will be loaded from Google Sheets
+  let SPECIAL_EVENTS = {};
+
+  // Google Sheets integration (Tabletop.js)
+  // 1. Create a Google Sheet with columns: date, title, time, desc
+  // 2. Publish the sheet to the web (File > Share > Publish to web)
+  // 3. Get the sheet's public URL or ID
+  // 4. Replace the SHEET_KEY below with your sheet's ID
+  // 5. Only you (the owner) can edit the sheet, but anyone can view
+
+  // Tabletop.js loader
+  function loadScript(url, callback) {
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.onload = callback;
+    script.src = url;
+    document.head.appendChild(script);
+  }
+
+  // Replace with your Google Sheet key (the long string in the sheet URL)
+  // For published links like yours, use the full published URL
+  const SHEET_KEY = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQJmygY63sOM8ikn3eDlKGFt3rEuX27u3FupC9Sn_VcWjGW69isuZ1VSK4Z8j_rACdYSAiZGxa76TJ4/pubhtml?gid=1550466262&single=true';
+
+  function fetchSpecialEvents(callback) {
+    // Show loading indicator
+    const cal = document.getElementById("calendar");
+    if (cal) cal.innerHTML = '<div style="text-align:center;padding:40px;font-size:20px;color:#0A174E;">Loading events...</div>';
+    // Load Tabletop.js if not present
+    if (typeof Tabletop === 'undefined') {
+      loadScript('https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.4/tabletop.min.js', function() {
+        fetchSpecialEvents(callback);
+      });
+      return;
+    }
+    try {
+      Tabletop.init({
+        key: SHEET_KEY,
+        simpleSheet: true,
+        callback: function(data) {
+          // Convert rows to SPECIAL_EVENTS object
+          SPECIAL_EVENTS = {};
+          data.forEach(function(row) {
+            if (!row.date || !row.title) return;
+            if (!SPECIAL_EVENTS[row.date]) SPECIAL_EVENTS[row.date] = [];
+            SPECIAL_EVENTS[row.date].push({
+              title: row.title,
+              time: row.time || '',
+              desc: row.desc || ''
+            });
+          });
+          if (callback) callback();
+        },
+        error: function(err) {
+          console.error('Failed to load Google Sheet:', err);
+          if (cal) cal.innerHTML = '<div style="text-align:center;padding:40px;font-size:18px;color:#a00;">Could not load special events.<br>Showing calendar without updates.</div>';
+          if (callback) callback();
+        }
+      });
+    } catch (e) {
+      console.error('Tabletop.js error:', e);
+      if (cal) cal.innerHTML = '<div style="text-align:center;padding:40px;font-size:18px;color:#a00;">Could not load special events.<br>Showing calendar without updates.</div>';
+      if (callback) callback();
+    }
+  }
+
+  /* ====== STATE ====== */
+  let currentView = "month";           // 'week' | 'month' | 'year'
+  let currentDate = new Date();        // anchor date
+  const periodLabel = () => document.getElementById("period-label");
+  const calendarEl  = () => document.getElementById("calendar");
+
+  /* ====== HELPERS ====== */
+  const fmt = (d) => d.toISOString().slice(0,10); // YYYY-MM-DD
+  const clone = (d) => new Date(d.getTime());
+  const startOfWeek = (d) => { const x = clone(d); x.setHours(0,0,0,0); x.setDate(x.getDate()-x.getDay()); return x; };
+  const addDays = (d,n) => { const x = clone(d); x.setDate(x.getDate()+n); return x; };
+  const daysInMonth = (y,m) => new Date(y, m+1, 0).getDate();
+  const isToday = (d) => fmt(d) === fmt(new Date());
+  // Mark days with any events (recurring, static, or special)
+  const hasEvents = (iso) => {
+    if (Array.isArray(EVENTS[iso]) && EVENTS[iso].length > 0) return true;
+    if (Array.isArray(SPECIAL_EVENTS[iso]) && SPECIAL_EVENTS[iso].length > 0) return true;
+    return false;
+  };
+
+  // Helper to get all events for a date (recurring + special)
+  function getEventsForDate(date) {
+    const iso = fmt(date);
+    let events = [];
+    // Recurring: Wednesday (3) and Friday (5)
+    if (date.getDay() === 3) {
+      events.push({ title: " Discipleship Fellowship ", time: "3:00-5:00 PM", desc: "Weekly Wednesday Fellowship." });
+    }
+    
+    if (date.getDay() === 5) {
+      // Last Friday in month?
+      const nextFriday = new Date(date);
+      nextFriday.setDate(date.getDate() + 7);
+      if (nextFriday.getMonth() !== date.getMonth()) {
+        events.push({ title: "Intercessory Night", time: "9:00-Next day PM", desc: "Tarry and Intercessory Night." });
+      } else {
+        events.push({ title: "Discipleship Fellowship", time: "3:00-5:00 PM", desc: "Weekly Friday Fellowship." });
+      }
+    }
+    // Add special events
+    if (SPECIAL_EVENTS[iso]) {
+      events = events.concat(SPECIAL_EVENTS[iso]);
+    }
+    return events;
+  }
+
+  function setView(v){
+    currentView = v;
+    // Toggle active button
+    document.querySelectorAll(".calendar-toggle button").forEach(btn=>{
+      btn.classList.toggle("active", btn.getAttribute("data-view") === v);
+    });
+    render();
+  }
+
+  function changePeriod(dir){
+    if(currentView === "month"){
+      currentDate.setMonth(currentDate.getMonth() + dir);
+    } else if(currentView === "week"){
+      currentDate.setDate(currentDate.getDate() + (7 * dir));
+    } else {
+      currentDate.setFullYear(currentDate.getFullYear() + dir);
+    }
+    render();
+  }
+
+  function render(){
+    if(currentView === "month") renderMonth();
+    else if(currentView === "week") renderWeek();
+    else renderYear();
+    renderUpdates();
+  }
+
+  /* ====== MONTH VIEW ====== */
+  function renderMonth(){
+    const cal = calendarEl();
+    cal.className = "calendar-grid grid-month";
+    cal.innerHTML = "";
+
+    const y = currentDate.getFullYear(), m = currentDate.getMonth();
+    periodLabel().textContent = `${currentDate.toLocaleString('default',{month:'long'})} ${y}`;
+
+    // DOW headers
+    ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d=>{
+      const h = document.createElement("div"); h.className="dow"; h.textContent=d; cal.appendChild(h);
+    });
+
+    const first = new Date(y,m,1);
+    const offset = first.getDay();
+    const total = daysInMonth(y,m);
+
+    // Previous month trailing days (muted)
+    const prevMonth = (m-1+12)%12, prevYear = m===0 ? y-1 : y;
+    const prevTotal = daysInMonth(prevYear, prevMonth);
+    for(let i=0;i<offset;i++){
+      const dNum = prevTotal - offset + 1 + i;
+      const d = new Date(prevYear, prevMonth, dNum);
+      cal.appendChild(dayCell(d, true));
+    }
+
+    // Current month days
+    for(let i=1;i<=total;i++){
+      const d = new Date(y,m,i);
+      cal.appendChild(dayCell(d, false));
+    }
+
+    // Next month leading days to complete 6 weeks view (optional prettiness)
+    const cellsSoFar = offset + total;
+    const nextFill = (7 * Math.ceil(cellsSoFar/7)) - cellsSoFar;
+    for(let i=1;i<=nextFill;i++){
+      const d = new Date(y, m+1, i);
+      cal.appendChild(dayCell(d, true));
+    }
+  }
+
+  function dayCell(date, muted){
+    const iso = fmt(date);
+    const el = document.createElement("div");
+    el.className = "day" + (muted ? " muted" : "") + (isToday(date) ? " today" : "");
+    el.innerHTML = `<div class="date">${date.getDate()}</div>`;
+    const events = getEventsForDate(date);
+    if(events.length > 0){
+      el.innerHTML += `<span class="badge">${events.length} event${events.length>1?"s":""}</span>`;
+      el.innerHTML += `<span class="dot"></span>`;
+      el.onclick = () => openModal(iso);
+    }
+    return el;
+  }
+
+  /* ====== WEEK VIEW ====== */
+  function renderWeek(){
+    const cal = calendarEl();
+    cal.className = "calendar-grid grid-week";
+    cal.innerHTML = "";
+
+    const start = startOfWeek(currentDate);
+    const end = addDays(start, 6);
+    periodLabel().textContent =
+      `${start.toLocaleDateString()} – ${end.toLocaleDateString()}`;
+
+    // Build seven day columns
+    for(let i=0;i<7;i++){
+      const d = addDays(start, i);
+      const iso = fmt(d);
+
+      const wrap = document.createElement('div');
+      wrap.className = 'week-cell';
+
+      const lab = document.createElement('div');
+      lab.className = 'week-label';
+      lab.textContent = `${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][i]} ${d.getMonth()+1}/${d.getDate()}`;
+      wrap.appendChild(lab);
+
+      const box = document.createElement('div');
+      box.className = 'week-box' + (isToday(d) ? ' today':'');
+      box.onclick = getEventsForDate(d).length > 0 ? () => openModal(iso) : null;
+
+      const events = getEventsForDate(d);
+      if(events.length > 0){
+        events.forEach(ev=>{
+          const chip = document.createElement('div');
+          chip.className = 'badge';
+          chip.style.marginRight = '6px';
+          chip.textContent = ev.time ? `${ev.time} • ${ev.title}` : ev.title;
+          box.appendChild(chip);
+        });
+      } else {
+        box.style.display = 'flex';
+        box.style.alignItems = 'center';
+        box.style.justifyContent = 'center';
+        box.style.color = '#888';
+        box.textContent = '—';
+      }
+
+      wrap.appendChild(box);
+      cal.appendChild(wrap);
+    }
+  }
+
+  /* ====== YEAR VIEW ====== */
+  function renderYear(){
+    const cal = calendarEl();
+    cal.className = "calendar-grid grid-year";
+    cal.innerHTML = "";
+
+    const y = currentDate.getFullYear();
+    periodLabel().textContent = `${y}`;
+
+    for(let m=0;m<12;m++){
+      const monthCard = document.createElement("div");
+      monthCard.className = "month-card";
+
+      const name = document.createElement("div");
+      name.className = "month-name";
+      name.textContent = new Date(y,m,1).toLocaleString('default',{month:'long'});
+      monthCard.appendChild(name);
+
+      // DOW row (tiny)
+      const mini = document.createElement("div");
+      mini.className = "mini-grid";
+
+      // Headers (smaller indicators)
+      ["S","M","T","W","T","F","S"].forEach(_=>{
+        const h = document.createElement("div");
+        h.className = "mini-cell";
+        h.style.background = "rgba(10,23,78,.1)";
+        h.style.fontWeight = "700";
+        h.textContent = _;
+        mini.appendChild(h);
+      });
+
+      const first = new Date(y,m,1).getDay();
+      const total = daysInMonth(y,m);
+
+      for(let i=0;i<first;i++){
+        const c = document.createElement("div"); c.className="mini-cell"; mini.appendChild(c);
+      }
+      for(let d=1; d<=total; d++){
+        const cell = document.createElement("div");
+        cell.className = "mini-cell";
+        cell.textContent = d;
+        const iso = fmt(new Date(y,m,d));
+        if(hasEvents(iso)) cell.classList.add("event");
+        cell.onclick = () => openModal(iso);
+        mini.appendChild(cell);
+      }
+
+      monthCard.appendChild(mini);
+      cal.appendChild(monthCard);
+    }
+  }
+
+  /* ====== UPDATES LIST ====== */
+  function renderUpdates(){
+    const ul = document.getElementById("event-list");
+    ul.innerHTML = "";
+    const todayIso = fmt(new Date());
+    // Merge all event dates from both EVENTS and SPECIAL_EVENTS
+    const allDates = new Set([
+      ...Object.keys(EVENTS),
+      ...Object.keys(SPECIAL_EVENTS)
+    ]);
+    const sorted = Array.from(allDates).sort();
+    const upcoming = sorted.filter(d => d >= todayIso).slice(0, 12);
+    (upcoming.length ? upcoming : sorted).forEach(date=>{
+      const li = document.createElement("li");
+      let items = [];
+      if (EVENTS[date]) items = items.concat(EVENTS[date].map(e => e.time ? `${e.time} • ${e.title}` : e.title));
+      if (SPECIAL_EVENTS[date]) items = items.concat(SPECIAL_EVENTS[date].map(e => e.time ? `${e.time} • ${e.title}` : e.title));
+      li.textContent = `${date}: ${items.join(" | ")}`;
+      ul.appendChild(li);
+    });
+  }
+
+  /* ====== MODAL ====== */
+  function openModal(iso){
+    const d = new Date(iso);
+    const events = getEventsForDate(d);
+    if(!events.length) return;
+    const modal = document.getElementById("event-modal");
+    const list  = document.getElementById("modal-events");
+    document.getElementById("modal-date").textContent = iso;
+    list.innerHTML = "";
+    events.forEach(e=>{
+      const li = document.createElement("li");
+      li.innerHTML = `<strong>${e.title}</strong>${e.time?` — ${e.time}`:""}${e.desc?`<br><small>${e.desc}</small>`:""}`;
+      list.appendChild(li);
+    });
+    modal.style.display = "flex";
+  }
+  function closeModal(){ document.getElementById("event-modal").style.display = "none"; }
+
+  // Init: fetch special events, then render calendar (always render, even if fetch fails)
+  fetchSpecialEvents(function() {
+    setView("month");
+  });
+</script>
+<button class="btn"><a href="welcome.html">GO BACK</a></button>
+<style>
+.btn{
+  background-color: #222;
+  color: #f3f3f3;
+  width:8opx;
+  font: size 10px;
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: inset 0 0 0 #f7c873;
+  transition: all ease 1s;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+.btn:hover{
+  box-shadow: inset 200px 0 0 #f7c873;
+  color:#222;
+}
+
+</style>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contacts - THE GYN FELLOWSHIP</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: #181818;
+      font-family: 'Roboto', 'Segoe UI', 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #f3f3f3;
+      min-height: 100vh;
+    }
+    .content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 0;
+    }
+    h1 {
+      color: #f7c873;
+      font-size: 2.5rem;
+      margin-bottom: 32px;
+      text-shadow: 2px 2px 8px #222;
+    }
+    .contacts-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 32px;
+      justify-content: center;
+      width: 100%;
+      max-width: 1100px;
+    }
+    .contact-card {
+      background: rgba(34, 34, 34, 0.85);
+      border-radius: 24px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+      padding: 28px 18px 18px 18px;
+      width: 260px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: box-shadow 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .contact-card img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-bottom: 18px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+      background: #222;
+    }
+    .contact-name {
+      font-size: 1.2rem;
+      color: #f7c873;
+      font-weight: bold;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    .contact-number {
+      font-size: 1.1rem;
+      color: #fffbe6;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+    @media (max-width: 700px) {
+      .contacts-grid { gap: 16px; }
+      .contact-card { width: 90vw; max-width: 320px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <h1>Meet our leaders</h1>
+    <div class="contacts-grid">
+      <div class="contact-card">
+        <img src="IMG-20241203-WA0011.jpg" alt=""onclick="openModal(this)">
+        <div class="contact-name">Brother James Victor</div>
+        <div class="contact-number">0777769830</div>
+         <button class="btn"> <a href="tel:0777769830"><strong>Call Me</strong></a></button>
+      </div>
+      <div class="contact-card">
+        <img src="Screenshot_20250728-145218.jpg" alt="Contact 5"onclick="openModal(this)">
+        <div class="contact-name">Brother Darius Johnny</div>
+        <div class="contact-number">0778734321</div>
+        <button class="btn"> <a href="tel:0778734321"><strong>Call Me</strong></a></button>
+      </div>
+      <div class="contact-card">
+        <img src="Screenshot_20250728-144455.jpg" alt="Contact 2"onclick="openModal(this)">
+        <div class="contact-name">Brother Jackson Caryahwea</div>
+        <div class="contact-number">0777681606</div>
+        <button class="btn"> <a href="tel:0777681606"><strong>Call Me</strong></a></button>
+      </div>
+      <div class="contact-card">
+        <img src="Screenshot_20250728-144602.jpg" alt="Contact 3"onclick="openModal(this)">
+        <div class="contact-name">Brother Namue Butler</div>
+        <div class="contact-number">0880776713</div>
+        <button class="btn"> <a href="tel:0880776713"><strong>Call Me</strong></a></button>
+      </div>
+      <div class="contact-card">
+        <img src="Screenshot_20250728-145125.jpg" alt="Contact 4"onclick="openModal(this)">
+        <div class="contact-name">Brother Moses Morris</div>
+        <div class="contact-number">+233596143812</div>
+        <button class="btn"> <a href="tel:+233596143812"><strong>Call Me</strong></a></button>
+      </div>
+        <div id="imgModal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); align-items:center; justify-content:center;">
+  <span onclick="closeModal()" style="position:absolute; top:30px; right:50px; color:#F5D042; font-size:3rem; font-weight:bold; cursor:pointer;">&times;</span>
+  <img id="modalImage" src="" alt="Preview" style="max-width:90vw; max-height:80vh; border-radius:18px; box-shadow:0 4px 24px #000; display:block; margin:auto;">
+</div>
+    </div>
+  </div>
+<button class="btn"><a href="welcome.html">GO BACK</a></button>
+<style>
+.btn{
+  background-color: #222;
+  color: #f3f3f3;
+  width:8opx;
+  font: size 10px;
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: inset 0 0 0 #f7c873;
+  transition: all ease 1s;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+.btn:hover{
+  box-shadow: inset 200px 0 0 #f7c873;
+  color:#222;
+}
+
+</style>
+<script>   function openModal(imgElem) {
+  var modal = document.getElementById('imgModal');
+  var modalImg = document.getElementById('modalImage');
+  modal.style.display = 'flex';
+  modalImg.src = imgElem.src;
+}
+function closeModal() {
+  document.getElementById('imgModal').style.display = 'none';
+}
+// Optional: close modal when clicking outside image
+document.getElementById('imgModal').onclick = function(e) {
+  if (e.target === this) closeModal();
+}</script>
+</body>
+</html>

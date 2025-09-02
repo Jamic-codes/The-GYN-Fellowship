@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Christian Fellowship  Challenges & Bible Quiz</title>
+<style>
+  :root{
+    --primary:#0A174E;
+    --primary-2:#132D6B;
+    --accent:#F5D042;
+    --bg:linear-gradient(135deg, #0a174e, #f5d042);
+    height: 100vh;
+    margin: 0;
+    --muted:#080606;
+  }
+  *{box-sizing:border-box}
+  body{font-family:Arial,Helvetica,sans-serif;background:var(--bg);margin:0;padding:0;color:#d6cccc}
+  .section{
+    width:90%;
+    max-width:
+    760px;margin:28px auto;
+    padding:20px;border-radius:16px;
+    background:var(--accent);
+    box-shadow:0 4px 12px rgba(0,0,0,.1);
+    text-align:center
+  }
+  h2,h3{color:var(--primary);margin:.2rem 0 .8rem}
+  .challenge-box{
+    background:#fff;padding:16px;border-radius:12px;margin-bottom:14px;color:var(--primary-2);text-align:left
+  }
+  h4{
+    font-size: 2.0rem;
+      color:1px 1px 6px #070505;
+      text-shadow:  #e9e6e0;
+      text-align: center;
+      text-decoration: underline;
+      font-style:sans-serif;
+  }
+  .btn{
+    display:inline-block;padding:10px 18px;border:none;border-radius:10px;background:var(--primary);
+    color:#fff;cursor:pointer;transition:background .25s; font-weight:600
+  }
+  .btn:hover{background:var(--primary-2)}
+  .btn.alt{background:#fff200;color:#000}
+  .nav .btn{margin:4px 6px}
+
+  /* Quiz */
+  .quiz{background: linear-gradient(135deg, #0a174e, #f5d042);}
+  .quiz .bar-wrap{width:100%;height:20px;background:var(--muted);border-radius:10px;overflow:hidden;margin:10px 0 14px}
+  .quiz .bar{height:100%;width:0;background:var(--primary);color:#fff;line-height:20px;text-align:center;transition:width .4s}
+  .timer{text-align:center;font-weight:bold;color:var(--primary-2);margin:6px 0 10px}
+  .question{font-weight:bold;margin:12px 0 8px}
+  .options label{
+    display:block;background:#3333c5;padding:10px;margin:6px 0;border-radius:10px;cursor:pointer;transition:background .25s
+  }
+  .options label:hover{background:#be9a06}
+  .options input{margin-right:8px}
+  .correct{background:#8fcf9e !important}
+  .wrong{background:#e27079 !important}
+  .explanation{font-style:italic;columns:rgb(0, 9, 51) ;   margin-top:6px}
+  .result,.highscore{margin-top:12px;font-weight:bold;color:var(--primary)}
+  #certificateCanvas{display:none}
+
+  /* Leaderboard */
+  .leaderboard{margin-top:16px}
+  #leaderboardSearch{
+    width:100%;padding:10px;border:1px solid #ccc;border-radius:10px;margin:8px 0
+  }
+  table{width:100%;border-collapse:collapse;margin-top:8px}
+  th,td{border:1px solid #dddada;padding:8px;text-align:center}
+  th{background:var(--primary);color:#fff}
+
+  /* Mobile */
+  @media (max-width:480px){
+    .section{padding:16px;margin:18px auto}
+    h2,h3{font-size:22px}
+    .btn{padding:9px 14px;font-size:14px}
+    .options label{font-size:14px;padding:9px}
+    th,td{font-size:12px;padding:6px}
+  }
+</style>
+</head>
+<body>
+<h4><em> Welcome to our daily bible quiz game-we hope you learn while playing</em></h4>
+<!-- WEEKLY CHALLENGE -->
+<section class="section">
+  <h3>Weekly Bible Challenge</h3>
+  <div class="challenge-box" id="weeklyBox">
+    <div id="weekRange"></div>
+    <div id="weekVerse"></div>
+    <div id="weekReflection"></div>
+  </div>
+  <div class="nav">
+    <button class="btn" id="prevWeekBtn">← Previous</button>
+    <button class="btn" id="nextWeekBtn">Next →</button>
+  </div>
+</section>
+
+<!-- MONTHLY CHALLENGE -->
+<section class="section">
+  <h3>Monthly Bible Challenge</h3>
+  <div class="challenge-box" id="monthlyBox">
+    <div id="monthName"></div>
+    <div id="monthVerse"></div>
+    <div id="monthReflection"></div>
+  </div>
+  <div class="nav">
+    <button class="btn" id="prevMonthBtn">← Previous</button>
+    <button class="btn" id="nextMonthBtn">Next →</button>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section class="section quiz">
+  <h2>Bible Quiz</h2>
+  <button class="btn" id="startQuizBtn">Start Quiz</button>
+
+  <div id="quizContent" style="display:none;">
+    <div class="timer" id="timer">Time Left: 15s</div>
+    <div class="bar-wrap"><div class="bar" id="progressBar">0%</div></div>
+
+    <form id="quizForm">
+      <div id="questionBox"></div>
+      <div class="nav">
+        <button type="button" class="btn" id="nextBtn">Next</button>
+        <button type="button" class="btn alt" id="resetBtn">Reset</button>
+      </div>
+    </form>
+
+    <div class="result" id="result"></div>
+    <div class="highscore" id="highscore"></div>
+    <button class="btn" id="downloadCertificate" style="display:none;">Download Certificate</button>
+
+    <div class="leaderboard">
+      <h3>Leaderboard</h3>
+      <input type="text" id="leaderboardSearch" placeholder="Search name..."/>
+      <table>
+        <thead><tr><th>Name</th><th>Score</th></tr></thead>
+        <tbody id="leaderboardBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<canvas id="certificateCanvas" width="800" height="600"></canvas>
+<audio id="correctSound" src="https://www.soundjay.com/button/beep-07.mp3"></audio>
+<audio id="wrongSound"   src="https://www.soundjay.com/button/beep-10.mp3"></audio>
+
+<script>
+/* ------------------ WEEKLY ------------------ */
+const weeklyChallenges = [
+  { start: "2025-08-18", end: "2025-08-24", verse: "Philippians 4:13", reflection: "Write how this verse applies to your life this week." },
+  { start: "2025-08-25", end: "2025-08-31", verse: "Proverbs 3:5-6", reflection: "Reflect on how you can trust God more daily." },
+  { start: "2025-09-01", end: "2025-09-07", verse: "Psalm 23:1-3", reflection: "Think about how God guides you through challenges." },
+  { start: "2025-09-08", end: "2025-09-14", verse: "Matthew 5:16", reflection: "Find a way to let your light shine this week." },
+  { start: "2025-09-15", end: "2025-09-21", verse: "Romans 12:2", reflection: "Consider what areas of your life need transformation." },
+  { start: "2025-09-22", end: "2025-09-28", verse: "1 Corinthians 13:4-5", reflection: "Reflect on how to show love and patience this week." }
+];
+let currentWeekIndex = 0;
+
+function detectCurrentWeek(){
+  const today = new Date();
+  for(let i=0;i<weeklyChallenges.length;i++){
+    const s=new Date(weeklyChallenges[i].start), e=new Date(weeklyChallenges[i].end);
+    if(today>=s && today<=e){ currentWeekIndex=i; break; }
+  }
+}
+function renderWeek(){
+  const c = weeklyChallenges[currentWeekIndex];
+  document.getElementById("weekRange").innerHTML = `<strong>Week:</strong> ${c.start} to ${c.end}`;
+  document.getElementById("weekVerse").innerHTML = `<strong>Verse:</strong> ${c.verse}`;
+  document.getElementById("weekReflection").innerHTML = `<strong>Reflection:</strong> ${c.reflection}`;
+}
+document.getElementById("prevWeekBtn").addEventListener("click", ()=>{ if(currentWeekIndex>0){currentWeekIndex--; renderWeek();}});
+document.getElementById("nextWeekBtn").addEventListener("click", ()=>{ if(currentWeekIndex<weeklyChallenges.length-1){currentWeekIndex++; renderWeek();}});
+detectCurrentWeek(); renderWeek();
+
+/* ------------------ MONTHLY ------------------ */
+const monthlyChallenges = [
+  { month: "January",   verse: "Isaiah 41:10",              reflection: "Trust God in this new year and let go of fear." },
+  { month: "February",  verse: "1 Corinthians 13:4-5",      reflection: "Reflect on showing love and patience daily." },
+  { month: "March",     verse: "Proverbs 3:5-6",            reflection: "Focus on trusting God fully this month." },
+  { month: "April",     verse: "Psalm 23:1-3",              reflection: "Meditate on God's guidance and comfort." },
+  { month: "May",       verse: "Matthew 5:16",              reflection: "Let your light shine to bless others." },
+  { month: "June",      verse: "Romans 12:2",               reflection: "Think about renewing your mind daily." },
+  { month: "July",      verse: "Philippians 4:13",          reflection: "Believe in the strength God gives you." },
+  { month: "August",    verse: "James 1:5",                 reflection: "Seek God's wisdom for decisions." },
+  { month: "September", verse: "Psalm 119:105",             reflection: "Let the Word guide your path." },
+  { month: "October",   verse: "Hebrews 11:1",              reflection: "Reflect on faith in what is unseen." },
+  { month: "November",  verse: "1 Thessalonians 5:18",      reflection: "Practice gratitude every day." },
+  { month: "December",  verse: "Luke 2:10-11",              reflection: "Celebrate Christ's birth with joy." }
+];
+let currentMonthIndex = new Date().getMonth();
+function renderMonth(){
+  const c = monthlyChallenges[currentMonthIndex];
+  document.getElementById("monthName").innerHTML       = `<strong>Month:</strong> ${c.month}`;
+  document.getElementById("monthVerse").innerHTML      = `<strong>Verse:</strong> ${c.verse}`;
+  document.getElementById("monthReflection").innerHTML = `<strong>Reflection:</strong> ${c.reflection}`;
+}
+document.getElementById("prevMonthBtn").addEventListener("click", ()=>{ currentMonthIndex = (currentMonthIndex+11)%12; renderMonth();});
+document.getElementById("nextMonthBtn").addEventListener("click", ()=>{ currentMonthIndex = (currentMonthIndex+1)%12;  renderMonth();});
+renderMonth();
+
+/* ------------------ QUIZ ------------------ */
+const questions = [
+ 
+  // ------------------ HARD ------------------
+  { q: "Which prophet married a prostitute as a symbolic act?", options: ["Hosea","Jeremiah","Isaiah"], answer: "Hosea", explanation: "Hosea married Gomer to symbolize Israel’s unfaithfulness (Hosea 1:2-3)." },
+  { q: "In the Book of Revelation, how many seals are there in the scroll?", options: ["5","7","12"], answer: "7", explanation: "The scroll has seven seals, each revealing end-time events (Revelation 5-8)." },
+  { q: "Who was known for patience amidst suffering in the Old Testament?", options: ["Job","Joseph","Daniel"], answer: "Job", explanation: "Job endured immense suffering but remained faithful to God (Book of Job)." },
+  { q: "Which Psalm begins and ends with the same verse, creating a chiastic structure?", options: ["Psalm 8","Psalm 136","Psalm 1"], answer: "Psalm 136", explanation: "Psalm 136 repeats 'His mercy endures forever' at the start and end." },
+  { q: "What are the two sins that lead to death in 1 John 5:16?", options: ["Murder & Theft","Sin unto death & Unforgiveness","Idolatry & Lying"], answer: "Sin unto death & Unforgiveness", explanation: "1 John 5:16 highlights praying for those committing sin unto death." },
+  { q: "Which prophet had a vision of dry bones?", options: ["Ezekiel","Isaiah","Jeremiah"], answer: "Ezekiel", explanation: "Ezekiel saw dry bones come to life, symbolizing Israel's restoration (Ezekiel 37)." },
+  { q: "Who was taken to heaven in a whirlwind without dying?", options: ["Elijah","Elisha","Moses"], answer: "Elijah", explanation: "Elijah was taken up to heaven in a whirlwind (2 Kings 2:11)." },
+  { q: "Who saw a burning bush that was not consumed?", options: ["Moses","Aaron","Joshua"], answer: "Moses", explanation: "God spoke to Moses from a bush that burned but was not consumed (Exodus 3)." },
+  { q: "Who was the mother of John the Baptist?", options: ["Elizabeth","Mary","Hannah"], answer: "Elizabeth", explanation: "Elizabeth gave birth to John the Baptist in her old age (Luke 1:5-25)." },
+  { q: "Which disciple walked on water to meet Jesus?", options: ["Peter","John","Thomas"], answer: "Peter", explanation: "Peter walked on water but began to sink when he doubted (Matthew 14:28-31)." },
+
+  // ------------------ MORE MIXED QUESTIONS ------------------
+  { q: "Who was the first murderer according to the Bible?", options: ["Cain","Abel","Lamech"], answer: "Cain", explanation: "Cain killed Abel out of jealousy (Genesis 4:8)." },
+  { q: "What are the fruits of the Spirit mentioned in Galatians 5:22-23?", options: ["Love, Joy, Peace, Patience, Kindness, Goodness, Faithfulness, Gentleness, Self-control","Love, Hope, Faith","Charity, Patience, Kindness"], answer: "Love, Joy, Peace, Patience, Kindness, Goodness, Faithfulness, Gentleness, Self-control", explanation: "Galatians 5:22-23 lists these nine fruits of the Spirit." },
+  { q: "Who was the king during Jesus’ birth?", options: ["Herod","Caesar","Pontius Pilate"], answer: "Herod", explanation: "King Herod ruled Judea at the time of Jesus’ birth (Matthew 2)." },
+  { q: "Which book contains the story of Esther?", options: ["Ruth","Esther","Nehemiah"], answer: "Esther", explanation: "Esther tells the story of a Jewish queen who saved her people." },
+  { q: "What is the shortest verse in the Bible?", options: ["Jesus wept","Rejoice always","Pray without ceasing"], answer: "Jesus wept", explanation: "John 11:35 is the shortest verse in the Bible." },
+  { q: "Who was the first king of Israel?", options: ["Saul","David","Solomon"], answer: "Saul", explanation: "Saul was anointed as the first king of Israel (1 Samuel 9-10)." },
+  { q: "Who betrayed Jesus for thirty pieces of silver?", options: ["Judas","Peter","Paul"], answer: "Judas", explanation: "Judas Iscariot betrayed Jesus to the chief priests (Matthew 26:14-16)." },
+  { q: "What city’s walls fell after Joshua’s army marched around them?", options: ["Jericho","Ai","Bethel"], answer: "Jericho", explanation: "The walls of Jericho fell after Israel circled the city (Joshua 6)." },
+  { q: "Who was the strong man in the Book of Judges who fought the Philistines?", options: ["Samson","Gideon","Ehud"], answer: "Samson", explanation: "Samson had supernatural strength and defeated the Philistines (Judges 13-16)." },
+  { q: "Which Old Testament prophet was fed by ravens?", options: ["Elijah","Elisha","Jeremiah"], answer: "Elijah", explanation: "God sent ravens to feed Elijah during a drought (1 Kings 17:2-6)." },
+  { q: "Who wrote the Book of Revelation?", options: ["John","Paul","Peter"], answer: "John", explanation: "John wrote Revelation while exiled on the island of Patmos." },
+  { q: "Who was Paul’s companion on his missionary journeys?", options: ["Barnabas","Timothy","Both"], answer: "Both", explanation: "Paul traveled with Barnabas and later with Timothy on missions." },
+  { q: "What is the Great Commission?", options: ["Make disciples of all nations","Feed the poor","Build the temple"], answer: "Make disciples of all nations", explanation: "Jesus instructed His disciples to make disciples of all nations (Matthew 28:19-20)." },
+  { q: "Which book has the vision of the valley of dry bones?", options: ["Ezekiel","Daniel","Isaiah"], answer: "Ezekiel", explanation: "Ezekiel saw the valley of dry bones symbolizing Israel's restoration (Ezekiel 37)." },
+  { q: "Who was Peter’s brother?", options: ["Andrew","James","John"], answer: "Andrew", explanation: "Andrew was Peter's brother and also a disciple of Jesus (Matthew 4:18-20)." },
+  { q: "Who was the tax collector that climbed a tree to see Jesus?", options: ["Zacchaeus","Matthew","Levi"], answer: "Zacchaeus", explanation: "Zacchaeus climbed a tree to see Jesus (Luke 19:1-10)." },
+  { q: "Which king had a writing on the wall during Belshazzar’s feast?", options: ["Belshazzar","Nebuchadnezzar","Darius"], answer: "Belshazzar", explanation: "God wrote a warning during Belshazzar’s feast (Daniel 5)." },
+  { q: "Who led Israel into the Promised Land?", options: ["Joshua","Moses","Caleb"], answer: "Joshua", explanation: "After Moses died, Joshua led Israel into Canaan (Joshua 1-4)." },
+  { q: "Who was known as the ‘friend of God’?", options: ["Abraham","Moses","David"], answer: "Abraham", explanation: "Abraham was called God’s friend (James 2:23)." },
+  { q: "Which prophet confronted King David over his sin with Bathsheba?", options: ["Nathan","Samuel","Elijah"], answer: "Nathan", explanation: "Nathan confronted David about his sin (2 Samuel 12)." },
+  { q: "Who interpreted Pharaoh’s dreams in Egypt?", options: ["Joseph","Daniel","Moses"], answer: "Joseph", explanation: "Joseph interpreted Pharaoh’s dreams, predicting seven years of famine (Genesis 41)." },
+  { q: "Who parted the Red Sea?", options: ["Moses","Joshua","Aaron"], answer: "Moses", explanation: "God parted the Red Sea through Moses to allow Israel to escape Egypt." },
+  { q: "Who was the disciple known as the ‘beloved’?", options: ["John","Peter","James"], answer: "John", explanation: "John is called the disciple whom Jesus loved (John 13:23)."},
+  { q: "Which book comes last in the Old Testament?", options: ["Malachi","Zechariah","Haggai"], answer: "Malachi", explanation: "Malachi is the final book in the Old Testament." },
+  { q: "Who anointed David as king?", options: ["Samuel","Nathan","Elijah"], answer: "Samuel", explanation: "Samuel anointed David in Bethlehem (1 Samuel 16:13)."},
+  { q: "Which judge defeated the Midianites with only 300 men?", options: ["Gideon","Samson","Deborah"], answer: "Gideon", explanation: "Gideon defeated the Midianites with a small army (Judges 7)."},
+  { q: "Who was the first Christian martyr?", options: ["Stephen","James","Peter"], answer: "Stephen", explanation: "Stephen was stoned to death for his faith (Acts 7)."},
+  { q: "Who was Jesus’ cousin and forerunner?", options: ["John the Baptist","Paul","Peter"], answer: "John the Baptist", explanation: "John prepared the way for Jesus (Luke 1:36-76)."},
+  { q: "Which prophet was taken into captivity in Babylon?", options: ["Daniel","Elijah","Jeremiah"], answer: "Daniel", explanation: "Daniel was taken to Babylon as a young man (Daniel 1)."},
+  { q: "Which apostle doubted Jesus’ resurrection until he saw Him?", options: ["Thomas","Peter","John"], answer: "Thomas", explanation: "Thomas doubted until Jesus appeared and showed His wounds (John 20:24-29)."},
+  { q: "What is the first miracle Jesus performed?", options: ["Turning water into wine","Healing the blind","Walking on water"], answer: "Turning water into wine", explanation: "Jesus turned water into wine at Cana (John 2:1-11)."},
+  { q: "Which disciple was a tax collector?", options: ["Matthew","Peter","Andrew"], answer: "Matthew", explanation: "Matthew, also called Levi, was a tax collector before following Jesus (Matthew 9:9)."},
+  { q: "Who was Saul’s successor as king?", options: ["David","Solomon","Samuel"], answer: "David", explanation: "David became king after Saul died (1 Samuel 16-2 Samuel 5)."},
+  { q: "Who was known as the mother of King Solomon?", options: ["Bathsheba","Abigail","Hannah"], answer: "Bathsheba", explanation: "Bathsheba was Solomon’s mother (2 Samuel 12:24)."},
+  { q: "Who wrote many of the Psalms?", options: ["David","Moses","Asaph"], answer: "David", explanation: "David wrote many Psalms expressing worship, praise, and lament." },
+  { q: "What is the last book in the New Testament?", options: ["Revelation","Jude","Acts"], answer: "Revelation", explanation: "Revelation is the final book of the Bible." },
+  { q: "Which Old Testament woman became queen of Persia?", options: ["Esther","Ruth","Deborah"], answer: "Esther", explanation: "Esther saved the Jewish people from Haman’s plot." },
+  { q: "Who was the father of John the Baptist?", options: ["Zechariah","Joseph","Simeon"], answer: "Zechariah", explanation: "Zechariah was the priest who received the message of John’s birth (Luke 1:5-25)."},
+  { q: "Which disciple was a fisherman before following Jesus?", options: ["Peter","Matthew","John"], answer: "Peter", explanation: "Peter (and his brother Andrew) were fishermen (Matthew 4:18-20)."}
+];
+
+
+
+
+let quizOrder = [];
+let currentQuestion = 0;
+let score = 0;
+let timeLeft = 15; // 15 seconds per question
+document.getElementById("quizContent").style.display = "none";
+let timerId = null;
+let highscore = Number(localStorage.getItem("bibleQuizHighscore") || 0);
+
+const correctSound = document.getElementById("correctSound");
+const wrongSound   = document.getElementById("wrongSound");
+const progressBar  = document.getElementById("progressBar");
+const timerEl      = document.getElementById("timer");
+const questionBox  = document.getElementById("questionBox");
+const resultEl     = document.getElementById("result");
+const highscoreEl  = document.getElementById("highscore");
+const certBtn      = document.getElementById("downloadCertificate");
+
+function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+
+function loadQuiz(){
+  quizOrder = shuffle([...questions]);
+  currentQuestion = 0;
+  score = 0;
+  resultEl.textContent = "";
+  certBtn.style.display = "none";
+  highscoreEl.textContent = `Highscore: ${highscore}`;
+  updateProgress();
+  showQuestion();
+}
+
+function updateProgress(){
+  const pct = Math.round((currentQuestion/quizOrder.length)*100);
+  progressBar.style.width = pct + "%";
+  progressBar.textContent = pct + "%";
+}
+
+function showQuestion(){
+  clearInterval(timerId);
+  timeLeft = 15; // reset timer for each question
+  timerEl.textContent = `Time Left: ${timeLeft}s`;
+
+  const q = quizOrder[currentQuestion];
+  const options = shuffle([...q.options]);
+
+  let html = `<div class="question">${currentQuestion+1}. ${q.q}</div><div class="options">`;
+  options.forEach(opt=>{
+    html += `<label><input type="radio" name="q" value="${opt}"> ${opt}</label>`;
+  });
+  html += `<div class="explanation" id="explanation"></div>`;
+  questionBox.innerHTML = html;
+
+  // Add event listeners for auto-advance after explanation
+  document.querySelectorAll('input[name="q"]').forEach(input => {
+    input.addEventListener('change', function() {
+      clearInterval(timerId);
+      revealAnswer(true); // auto-next
+    });
+  });
+
+  timerId = setInterval(()=>{
+    timeLeft--;
+    timerEl.textContent = `Time Left: ${timeLeft}s`;
+    if(timeLeft<=0){
+      clearInterval(timerId);
+      revealAnswer(true); // auto-next on timeout
+    }
+  },1000);
+}
+
+function revealAnswer(autoNext = false){
+  const q = quizOrder[currentQuestion];
+  const selected = document.querySelector('input[name="q"]:checked');
+  const options = document.querySelectorAll('input[name="q"]');
+
+  options.forEach(opt => {
+    if(opt.value === q.answer) opt.parentElement.classList.add("correct");
+    if(selected && selected.value !== q.answer && opt.checked) opt.parentElement.classList.add("wrong");
+    opt.disabled = true;
+  });
+
+  if(selected && selected.value === q.answer){
+    score++; try{correctSound.currentTime=0; correctSound.play();}catch(e){}
+  }else{
+    try{wrongSound.currentTime=0; wrongSound.play();}catch(e){}
+  }
+
+  const exp = document.getElementById("explanation");
+  exp.textContent = `Explanation: ${q.explanation}`;
+
+  if(autoNext){
+    setTimeout(()=>{
+      currentQuestion++;
+      if(currentQuestion < quizOrder.length){
+        updateProgress();
+        showQuestion();
+      }else{
+        finishQuiz();
+      }
+    }, 2500);
+  }
+}
+
+function nextQuestion(){
+  revealAnswer();
+  currentQuestion++;
+  if(currentQuestion < quizOrder.length){
+    updateProgress();
+    setTimeout(showQuestion, 1200);
+  }else{
+    finishQuiz();
+  }
+}
+
+function finishQuiz(){
+  updateProgress();
+  resultEl.innerHTML = `<span style='font-size:1.2em;font-weight:bold;'>Quiz Finished!</span><br>You scored <span style='color:#0A174E;'>${score}</span> out of <span style='color:#0A174E;'>${quizOrder.length}</span>`;
+  if(score > highscore){
+    highscore = score;
+    localStorage.setItem("bibleQuizHighscore", String(highscore));
+  }
+  highscoreEl.textContent = `Highscore: ${highscore}`;
+  certBtn.style.display = "inline-block";
+}
+
+function resetQuiz(){
+  clearInterval(timerId);
+  loadQuiz();
+}
+
+document.getElementById("startQuizBtn").addEventListener("click", ()=>{
+  document.getElementById("quizContent").style.display = "block";
+  document.getElementById("startQuizBtn").style.display = "none";
+  loadQuiz();
+});
+document.getElementById("nextBtn").style.display = "none";
+document.getElementById("resetBtn").addEventListener("click", resetQuiz);
+
+/* Leaderboard */
+function updateLeaderboard(name, scoreVal){
+  let lb = JSON.parse(localStorage.getItem("bibleQuizLeaderboard") || "[]");
+  lb.push({ name, score: scoreVal });
+  lb.sort((a,b)=>b.score-a.score);
+  lb = lb.slice(0, 50);
+  localStorage.setItem("bibleQuizLeaderboard", JSON.stringify(lb));
+  renderLeaderboard();
+}
+function renderLeaderboard(){
+  const lb = JSON.parse(localStorage.getItem("bibleQuizLeaderboard") || "[]");
+  const tbody = document.getElementById("leaderboardBody");
+  tbody.innerHTML = "";
+  lb.forEach(row=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${row.name}</td><td>${row.score}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+document.getElementById("leaderboardSearch").addEventListener("keyup", function(){
+  const q = this.value.toLowerCase();
+  const rows = document.getElementById("leaderboardBody").getElementsByTagName("tr");
+  for(let i=0;i<rows.length;i++){
+    const nameCell = rows[i].getElementsByTagName("td")[0];
+    const txt = nameCell ? nameCell.textContent.toLowerCase() : "";
+    rows[i].style.display = txt.indexOf(q) > -1 ? "" : "none";
+  }
+});
+renderLeaderboard();
+
+/* Certificate (PNG download) */
+document.getElementById("downloadCertificate").addEventListener("click", ()=>{
+  const canvas = document.getElementById("certificateCanvas");
+  const ctx = canvas.getContext("2d");
+  const bg = new Image();
+  bg.crossOrigin = "anonymous";
+  bg.src = "https://i.imgur.com/J2QmEBk.jpg"; // simple certificate background
+  bg.onload = function(){
+    ctx.drawImage(bg,0,0,canvas.width,canvas.height);
+    ctx.fillStyle = "#0A174E";
+    ctx.textAlign = "center";
+
+    ctx.font = "50px Georgia";
+    ctx.fillText("Certificate of Achievement", canvas.width/2, 120);
+
+    ctx.font = "24px Georgia";
+    ctx.fillText("This certificate is proudly presented to", canvas.width/2, 200);
+
+    const name = prompt("Enter your name for the certificate:", "Anonymous") || "Anonymous";
+    ctx.font = "36px Georgia";
+    ctx.fillText(name, canvas.width/2, 270);
+
+    ctx.font = "24px Georgia";
+    ctx.fillText(`For completing the Bible Quiz with a score of ${score} / ${quizOrder.length}`, canvas.width/2, 340);
+
+    ctx.font = "20px Georgia";
+    ctx.fillText(`Date: ${new Date().toLocaleDateString()}`, canvas.width/2, 400);
+
+    updateLeaderboard(name, score);
+
+    const link = document.createElement("a");
+    link.download = `BibleQuiz_Certificate_${name}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  };
+});
+</script>
+
+<button class="btn" onclick="window.location.href='welcome.html'">GO BACK</button>
+<style>
+.btn{
+  background-color: #222;
+  color: #f3f3f3;
+  width:8opx;
+  font: size 10px;
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: inset 0 0 0 #f7c873;
+  transition: all ease 1s;
+  min-width: 120px;
+  align-items: center;
+  text-align: center;
+}
+.btn:hover{
+  box-shadow: inset 200px 0 0 #f7c873;
+  color:#222;
+}
+
+</style>
+</body>
+</html>

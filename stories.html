@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Testimonies & Stories</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #0a174e, #f5d042);
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      padding: 20px;
+      color: #fff;
+    }
+
+    /* Carousel */
+    .carousel {
+  position: relative;
+  width: 90%;
+  max-width: 800px;
+  margin: 20px auto;
+  overflow: hidden;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  transition: height 0.5s ease;
+}
+
+.carousel-inner {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+  position: relative;
+}
+
+.carousel-item {
+  min-width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out, padding 0.5s ease;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.carousel-item.active {
+  opacity: 1;
+  position: relative;
+}
+
+.carousel-item img {
+  max-width: 150px;
+  height: auto;
+  border-radius: 8px;
+  display: block;
+  margin: 0 auto 10px;
+  cursor: pointer;
+}
+
+.carousel-item p {
+  font-style: italic;
+  font-size: 1rem;
+  margin: 0 10px;
+}
+
+.carousel-item h3 {
+  margin: 10px 0 0 0;
+  color: #0a174e;
+  font-size: 1.1rem;
+}
+
+/* Carousel Controls */
+.carousel-control {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0,0,0,0.4);
+  border: none;
+  color: white;
+  font-size: 2rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+  z-index: 10;
+}
+.carousel-control.prev {
+  left: 10px;
+}
+.carousel-control.next {
+  right: 10px;
+}
+.carousel-control:hover {
+  background-color: rgba(0,0,0,0.7);
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .carousel-item {
+    padding: 15px;
+  }
+  .carousel-item img {
+    max-width: 120px;
+  }
+  .carousel-item p {
+    font-size: 0.9rem;
+  }
+  .carousel-item h3 {
+    font-size: 1rem;
+  }
+  .carousel-control {
+    font-size: 1.5rem;
+    padding: 0.3rem 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .carousel-item {
+    padding: 10px;
+  }
+  .carousel-item img {
+    max-width: 90px;
+  }
+  .carousel-item p {
+    font-size: 0.8rem;
+  }
+  .carousel-item h3 {
+    font-size: 0.9rem;
+  }
+  .carousel-control {
+    font-size: 1.2rem;
+    padding: 0.2rem 0.5rem;
+  }
+}
+.carousel-inner {
+  display: flex;
+  transition: transform 0.3s ease-out;
+  position: relative;
+}
+.carousel-item {
+  min-width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  text-align: center;
+  opacity: 1; /* Keep opacity 1 for swipe sliding */
+  position: relative;
+  transition: opacity 0.5s ease-in-out;
+}
+
+    /* Stories Section */
+    .stories {
+      width: 90%;
+      max-width: 900px;
+      margin: 40px auto;
+      font-size: 1.1rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      color: #213e8f; letter-spacing: 1px;
+    }
+
+    .story-card {
+       background: rgba(177, 187, 235, 0.85);
+      border-radius: 18px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+      padding: 18px 12px 12px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: box-shadow 0.3s, transform 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .story-card:hover {
+      box-shadow: 0 8px 32px #F5D04244;
+      transform: translateY(-6px) scale(1.03);
+    }
+
+    .story-card img {
+      max-width: 100%;
+      height: 200px;
+      border-radius: 8px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+      background: #222;
+      transition: transform 0.2s;
+      cursor: pointer;
+    }
+    .story-card .desc {
+      color: #fffbe6;
+      font-size: 1rem;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .story-card h3 {
+      margin-top: 0;
+      color: #0a174e;
+    }
+
+    .story-card.highlight {
+      border: 3px solid #f5d042;
+      transition: border 0.5s ease;
+    }
+
+    /* Submit Form */
+    .submit-form {
+      width: 90%;
+      max-width: 600px;
+      margin: 40px auto;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .submit-form h2 {
+      text-align: center;
+      color: #0a174e;
+    }
+
+    .submit-form input,
+    .submit-form textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .submit-form button {
+      background: #0a174e;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: block;
+      margin: 10px auto;
+    }
+
+    .submit-form button:hover {
+      background: #f5d042;
+      color: #0a174e;
+    }
+
+    /* Popup Overlay */
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .popup-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 600px;
+      width: 90%;
+      text-align: center;
+      position: relative;
+    }
+
+    .popup-content h3 {
+      margin-top: 0;
+      color: #0a174e;
+    }
+
+    .popup-content p {
+      margin: 15px 0;
+    }
+
+    .close-popup {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      cursor: pointer;
+      font-size: 20px;
+      color: #0a174e;
+    }
+  </style>
+</head>
+<body>
+<!-- Add Firebase SDKs at the top of your HTML <head> -->
+
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+
+
+  <h1>Testimonies & Stories</h1>
+  <div style="max-width:700px;margin:0 auto 18px auto;padding:16px 24px;background:#f5d042;color:#0a174e;font-size:1.25rem;border-radius:12px;text-align:center;font-weight:bold;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+    <span>We would love to hear from you! Please share your testimony or story below to encourage others and glorify God. Your story matters!</span>
+  </div>
+
+  <!-- Carousel Section -->
+
+<div class="carousel">
+  <div class="carousel-inner" id="carouselInner">
+    <div class="carousel-item active">
+      <img src="IMG-20250629-WA0047.jpg" alt="Head of Disciples">
+      <p>"Praise the Lord, family! He has brought us this far and His blessings abound. Let us lift our voices in thanksgiving and rejoice together, for His faithfulness endures forever!"</p>
+      <h3>— Head of Disciples</h3>
+    </div>
+    <div class="carousel-item">
+      <img src="Screenshot_20250728-144602.jpg" alt="Disciple Butler">
+      <p>"Celebrate, brothers and sisters! God's love has carried us through every storm. Today we honor Him, rejoice in His goodness, and walk boldly in the joy of His salvation.Through prayer I found peace and direction in my studies."</p>
+      <h3>— Disciple Butler</h3>
+    </div>
+    <div class="carousel-item">
+      <img src="Screenshot_20250822-022408.jpg" alt="Disciple Darius">
+      <p>"God is worthy of all our praise! Today we celebrate His victories, His protection, and the unending love He pours into our lives. Glory to His name forever.The fellowship taught me how to forgive and love again."</p>
+      <h3>— Disciple Darius</h3>
+    </div>
+    <div class="carousel-item">
+      <img src="Screenshot_20250728-144455.jpg" alt="Disciple Jackson">
+      <p>"I never really understood what it meant to have a personal relationship with God. My friend invited me to read the Bible with him, and at first, I was skeptical. But as I listened and prayed, I felt a peace I had never known. Now, I pray every day and try to live according to God’s Word.
+       I am truly thankful for that moment I opened my heart"</p>
+      <h3>— Disciple Jackson</h3>
+    </div>
+    <div class="carousel-item">
+      <img src="Screenshot_20250728-145125.jpg" alt="Disciple Moses">
+      <p>"Rejoice in the Lord always, family! His mercy, grace, and provision have never failed us. Let us celebrate His goodness and share His light with the world"</p>
+      <h3>— Disciple Moses</h3>
+    </div>
+  </div>
+
+  <!-- Carousel Controls -->
+  <button class="carousel-control prev" onclick="prevSlide()">❮</button>
+  <button class="carousel-control next" onclick="nextSlide()">❯</button>
+</div>
+
+
+
+
+  <!-- Stories Section -->
+  <div class="stories" id="storiesSection">
+    <div class="story-card">
+      <img src="Screenshot_20250822-022408.jpg" alt=""onclick="openModal(this)">
+      <h3>Darius' Story</h3>
+      <p>I remember that day vividly. James and I were both feeling lost, and our friend took the time to speak truth into our hearts. Hearing the gospel and praying together with James made it real. That moment changed everything, and I finally began a new journey with Christ..</p>
+    </div>
+    <div class="story-card">
+      <img src="Screenshot_20250728-145125.jpg" alt=""onclick="openModal(this)">
+      <h3>Moses' Story</h3>
+      <p>“I had been drifting, unsure of my purpose. James shared his story with me and encouraged me to seek God. His testimony touched my heart, and I realized I had been ignoring God’s call. I prayed, repented, and felt a freedom I had never known.”</p>
+    </div>
+     <div class="story-card">
+      <img src="IMG-20250821-WA0004.jpg" alt=""onclick="openModal(this)">
+      <h3>Jackson' Story</h3>
+      <p>“I never really understood what it meant to have a personal relationship with God. My friend invited me to read the Bible with him, and at first, I was skeptical. But as I listened and prayed, I felt a peace I had never known. Now, I pray every day and try to live according to God’s Word.
+         I am truly thankful for that moment I opened my heart.”</p>
+    </div>
+     <div class="story-card">
+      <img src="my images/pm_1746960981680_cmp.jpg" alt=""onclick="openModal(this)">
+      <h3>James' Story</h3>
+      <p>“Darius and I had been struggling with emptiness and searching for meaning in our lives. One day, a friend sat us down and shared the gospel with both of us. Their words were convicting, and we realized we needed Jesus. Together, we prayed and surrendered our lives, feeling a peace we had never known.”</p>
+    </div>
+     <div class="story-card">
+      <img src="my images/Screenshot_20250728-144622.jpg" alt=""onclick="openModal(this)">
+      <h3>Butler's Story</h3>
+      <p>“I was skeptical and felt distant from God, but James passion for Christ challenged me. Seeing the change in his life made me curious, and his encouragement led me to pray and surrender my life to Jesus. That decision brought joy and peace I didn’t know was possible”</p>
+    </div>
+  </div>
+  <div id="imgModal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); align-items:center; justify-content:center;">
+  <span onclick="closeModal()" style="position:absolute; top:30px; right:50px; color:#F5D042; font-size:3rem; font-weight:bold; cursor:pointer;">&times;</span>
+  <img id="modalImage" src="" alt="Preview" style="max-width:90vw; max-height:80vh; border-radius:18px; box-shadow:0 4px 24px #000; display:block; margin:auto;">
+</div>
+
+  <!-- Submit Form -->
+  <div class="submit-form">
+    <h2>Share Your Testimony / Story</h2>
+    <input type="text" id="name" placeholder="Your Name" required>
+    <textarea id="story" rows="5" placeholder="Write your testimony or story here..." required></textarea>
+    <input type="file" id="imageUpload" accept="image/*">
+    <button onclick="addStory()">Submit</button>
+  </div>
+
+
+  
+<!-- ================================ -->
+<!-- Firebase & JS Logic -->
+<!-- ================================ -->
+<script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-storage-compat.js"></script>
+
+<script>
+  // ======= Firebase Config =======
+  const firebaseConfig = {
+   apiKey: "AIzaSyCcJGam-IorctNu7gVH-ULfi6AwBApgK1k",
+    authDomain: "the-gyn-fellowship.firebaseapp.com",
+    databaseURL: "https://the-gyn-fellowship-default-rtdb.firebaseio.com",
+    projectId: "the-gyn-fellowship",
+    storageBucket: "the-gyn-fellowship.firebasestorage.app",
+    messagingSenderId: "834036869939",
+    appId: "1:834036869939:web:7260ba0db00ae86a5fac46"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const storage = firebase.storage();
+
+  const storiesSection = document.getElementById("storiesSection");
+
+  // Countdown formatter
+  function getTimeLeft(expireTime) {
+    const now = Date.now();
+    let diff = expireTime - now;
+    if (diff <= 0) return "Expired";
+
+    const days = Math.floor(diff / (1000*60*60*24));
+    diff %= (1000*60*60*24);
+    const hours = Math.floor(diff / (1000*60*60));
+    diff %= (1000*60*60);
+    const minutes = Math.floor(diff / (1000*60));
+
+    return `Expires in ${days}d ${hours}h ${minutes}m`;
+  }
+
+  async function addStory() {
+    const name = document.getElementById("name").value.trim();
+    const story = document.getElementById("story").value.trim();
+    const imageInput = document.getElementById("imageUpload");
+
+    if (!name || !story) {
+      alert("Please enter both your name and story.");
+      return;
+    }
+
+    const timestamp = Date.now();
+    const oneWeek = 7*24*60*60*1000;
+    const expireTime = timestamp + oneWeek;
+
+    let imgURL = "";
+
+    if (imageInput.files && imageInput.files[0]) {
+      const file = imageInput.files[0];
+      const storageRef = storage.ref().child(`stories/${timestamp}_${file.name}`);
+      await storageRef.put(file);
+      imgURL = await storageRef.getDownloadURL();
+    }
+
+    // Save story to Firestore
+    await db.collection("stories").add({
+      name,
+      story,
+      imgURL,
+      timestamp,
+      expireTime
+    });
+
+    document.getElementById("name").value = "";
+    document.getElementById("story").value = "";
+    document.getElementById("imageUpload").value = "";
+
+    loadStories();
+  }
+
+  async function loadStories() {
+    storiesSection.innerHTML = "";
+    const now = Date.now();
+    const querySnapshot = await db.collection("stories").orderBy("timestamp", "desc").get();
+
+    querySnapshot.forEach(async doc => {
+      const data = doc.data();
+      if (data.expireTime && now >= data.expireTime) {
+        await db.collection("stories").doc(doc.id).delete();
+        return;
+      }
+
+      const newCard = document.createElement("div");
+      newCard.className = "story-card";
+
+      if (data.imgURL) {
+        newCard.innerHTML = `
+          <img src="${data.imgURL}" alt="${data.name}" onclick="openModal(this)">
+          <h3>${data.name}</h3>
+          <p>${data.story}</p>
+          <small class="countdown-text" data-expire="${data.expireTime}">${getTimeLeft(data.expireTime)}</small>
+        `;
+      } else {
+        newCard.innerHTML = `
+          <h3>${data.name}</h3>
+          <p>${data.story}</p>
+          <small class="countdown-text" data-expire="${data.expireTime}">${getTimeLeft(data.expireTime)}</small>
+        `;
+      }
+
+      storiesSection.appendChild(newCard);
+    });
+  }
+
+  // Update countdowns every minute
+  setInterval(() => {
+    document.querySelectorAll(".countdown-text").forEach(el => {
+      const expire = parseInt(el.dataset.expire);
+      el.textContent = getTimeLeft(expire);
+    });
+  }, 60000);
+
+  window.addEventListener("load", loadStories);
+
+  // ==============================
+  // Carousel Logic
+  // ==============================
+  let currentIndex = 0;
+  let autoSlideInterval;
+
+  function showSlide(index) {
+    const items = document.querySelectorAll(".carousel-item");
+    if (items.length === 0) return;
+
+    if (index < 0) index = items.length - 1;
+    if (index >= items.length) index = 0;
+
+    currentIndex = index;
+    const offset = -index * 100;
+    document.querySelector(".carousel-inner").style.transform = `translateX(${offset}%)`;
+  }
+
+  function nextSlide() { showSlide(currentIndex+1); resetAutoSlide(); }
+  function prevSlide() { showSlide(currentIndex-1); resetAutoSlide(); }
+
+  function startAutoSlide() { autoSlideInterval = setInterval(()=>showSlide(currentIndex+1),10000); }
+  function resetAutoSlide() { clearInterval(autoSlideInterval); startAutoSlide(); }
+
+  // Swipe support
+  function initSwipe() {
+    const carouselInner = document.querySelector(".carousel-inner");
+    if (!carouselInner) return;
+
+    let startX = 0;
+    carouselInner.addEventListener("touchstart", e => startX = e.touches[0].clientX);
+    carouselInner.addEventListener("touchend", e => {
+      const endX = e.changedTouches[0].clientX;
+      if (startX - endX > 50) nextSlide();
+      if (endX - startX > 50) prevSlide();
+    });
+  }
+
+  window.addEventListener("load", () => {
+    showSlide(currentIndex);
+    startAutoSlide();
+    initSwipe();
+  });
+
+  // ==============================
+  // Modal functions
+  // ==============================
+  function openModal(img) {
+    document.getElementById("modalImage").src = img.src;
+    document.getElementById("imgModal").style.display = "flex";
+  }
+
+  function closeModal() {
+    document.getElementById("imgModal").style.display = "none";
+  }
+</script>
+<button class="btn"><a href="welcome.html">←GO BACK Home</a></button>
+<style>
+.btn{
+  background-color: #222;
+  color: #f3f3f3;
+  width:8opx;
+  font: size 10px;
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: inset 0 0 0 #f7c873;
+  transition: all ease 1s;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  
+}
+.btn:hover{
+  box-shadow: inset 200px 0 0 #f7c873;
+  color:#222;
+}
+
+</style>
+</body>
+</html>

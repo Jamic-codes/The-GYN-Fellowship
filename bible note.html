@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Christian Notes</title>
+  <meta name="description" content="A simple place to publish your Christian notes and devotionals for visitors." />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0e11; --card: #11161c; --muted: #6b7280; --text: #e5e7eb;
+      --accent: #84cc16; --accent-strong: #65a30d; --ring: rgba(132,204,22,0.35);
+    }
+    @media (prefers-color-scheme: light){
+      :root {
+        --bg: #f7fafc; --card: #ffffff; --muted: #4b5563; --text: #0b0e11;
+        --accent: #3b82f6; --accent-strong: #1d4ed8; --ring: rgba(59,130,246,0.25);
+      }
+    }
+    body {
+      margin:0; font-family: Inter, system-ui, sans-serif;
+      background:var(--bg); color:var(--text); line-height:1.5;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .container { max-width:1100px; margin:0 auto; padding:24px }
+    header { display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px; padding:8px 0 20px }
+    .title { display:flex; align-items:center; gap:12px }
+    .logo { width:42px; height:42px; border-radius:12px; display:grid; place-items:center; background:linear-gradient(135deg,var(--accent),var(--accent-strong)); color:white; font-weight:800 }
+    h1 { font-size: clamp(1.3rem, 2.4vw, 2rem); margin:0 }
+    .controls { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    button, .btn {
+      background:var(--accent); color:#0b0e11; border:none; padding:10px 14px;
+      border-radius:14px; font-weight:700; cursor:pointer; box-shadow:0 6px 18px var(--ring); transition:transform .05s ease;
+    }
+    button:hover { transform: translateY(-1px) }
+    button.ghost { background:transparent; color:var(--text); border:1px solid rgba(128,128,128,.3) }
+    .search { display:flex; align-items:center; gap:10px; background:var(--card); padding:10px 14px; border-radius:14px; border:1px solid rgba(128,128,128,.25); flex:1; min-width:0; }
+    .search input { border:none; outline:none; background:transparent; color:var(--text); width:100%; min-width:0; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px,1fr)); gap:16px }
+    .card { background:var(--card); border:1px solid rgba(128,128,128,.22); border-radius:20px; padding:18px; display:flex; flex-direction:column; gap:10px }
+    .card h3 { margin:.2rem 0 }
+    .meta { font-size:.82rem; color:var(--muted) }
+    .tag { display:inline-flex; align-items:center; font-size:.78rem; background:rgba(128,128,128,.12); padding:6px 10px; border-radius:999px }
+    .tags { display:flex; gap:8px; flex-wrap:wrap }
+    .note-actions { display:flex; gap:8px; margin-top:4px; flex-wrap:wrap }
+    dialog::backdrop { background:rgba(0,0,0,.55) }
+    dialog { border:none; border-radius:20px; width:min(720px, 92vw); max-width:92vw; }
+    .dialog-card { background:var(--card); color:var(--text); padding:18px; border-radius:20px }
+    input, textarea { width:100%; background:transparent; color:var(--text); border:1px solid rgba(128,128,128,.35); border-radius:12px; padding:10px; font-size:1rem }
+    textarea { min-height:120px; resize:vertical }
+    .empty { text-align:center; opacity:.8; padding:40px; border:2px dashed rgba(128,128,128,.3); border-radius:18px }
+
+    /* Mobile responsiveness tweaks */
+    @media (max-width: 600px) {
+      header { flex-direction: column; align-items: flex-start; }
+      .controls { width: 100%; justify-content: space-between; }
+      .note-actions { flex-direction: column; }
+      dialog { width: 90vw; }
+    }
+
+    /* Admin button hidden by default */
+    #btnAdmin { display:none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="title">
+        <div class="logo">✝︎</div>
+        <div>
+          <h1>Christian Notes</h1>
+          <div class="meta">Devotionals, sermons & reflections</div>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="search"><input id="q" type="text" placeholder="Search…" /></div>
+        <button id="btnAdmin">Admin</button>
+        <button class="ghost" id="btnExport">Export</button>
+        <label class="btn ghost" for="importFile" style="cursor:pointer">Import</label>
+        <input id="importFile" class="sr-only" type="file" accept="application/json" hidden />
+      </div>
+    </header>
+
+    <main id="notesGrid" class="grid"></main>
+    <div id="emptyState" class="empty" hidden>No notes yet. Click <em>Admin</em> to add your first note.</div>
+
+    <template id="cardTpl">
+      <article class="card" data-id="">
+        <h3></h3>
+        <div class="meta"></div>
+        <p class="body"></p>
+        <div class="tags"></div>
+        <div class="note-actions">
+          <a class="link" target="_blank" rel="noopener" data-role="verse">Open scripture</a>
+          <button class="ghost" data-role="copy">Copy</button>
+          <button class="ghost" data-role="edit">Edit</button>
+          <button class="ghost" data-role="del">Delete</button>
+        </div>
+      </article>
+    </template>
+  </div>
+
+  <!-- Admin login -->
+  <dialog id="authDialog">
+    <form method="dialog" class="dialog-card">
+      <h2>Admin Login</h2>
+      <label>Passcode (default: <code>amen</code>)</label>
+      <input id="pass" type="password" required />
+      <div class="row" style="margin-top:12px">
+        <button value="ok">Enter</button>
+        <button class="ghost" value="cancel">Cancel</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Note editor -->
+  <dialog id="editDialog">
+    <form id="noteForm" class="dialog-card" method="dialog">
+      <h2 id="formTitle">Add Note</h2>
+      <input type="hidden" id="noteId" />
+      <label>Title</label><input id="title" required />
+      <label>Date</label><input id="date" type="date" />
+      <label>Scripture</label><input id="verse" placeholder="e.g., John 3:16" />
+      <label>Tags (comma separated)</label><input id="tags" placeholder="faith, hope" />
+      <label>Content</label><textarea id="body" required></textarea>
+      <div class="row" style="margin-top:12px">
+        <button value="ok">Save</button>
+        <button class="ghost" value="cancel">Cancel</button>
+      </div>
+    </form>
+  </dialog>
+
+<script>
+const STORE_KEY = 'christianNotes';
+const ADMIN_PASS = 'amen';
+let notes = loadNotes();
+let isAdmin = false;
+
+// Elements
+const grid = document.getElementById('notesGrid');
+const emptyState = document.getElementById('emptyState');
+const tpl = document.getElementById('cardTpl');
+const authDialog = document.getElementById('authDialog');
+const passInput = document.getElementById('pass');
+const editDialog = document.getElementById('editDialog');
+const form = document.getElementById('noteForm');
+const noteId = document.getElementById('noteId');
+const titleInput = document.getElementById('title');
+const dateInput = document.getElementById('date');
+const verseInput = document.getElementById('verse');
+const tagsInput = document.getElementById('tags');
+const bodyInput = document.getElementById('body');
+const adminBtn = document.getElementById('btnAdmin');
+
+// Init
+render();
+
+// --- Admin Access Logic ---
+// PC shortcut: type "admin123"
+let typedKeys = '';
+document.addEventListener('keydown', e => {
+  typedKeys += e.key;
+  if (typedKeys.endsWith('admin123')) {
+    adminBtn.style.display = 'inline-block';
+    typedKeys = '';
+  }
+  if (typedKeys.length > 20) typedKeys = typedKeys.slice(-20);
+});
+
+// Mobile long press
+let touchStartTime = 0;
+document.addEventListener('touchstart', e => {
+  if(e.touches.length === 1){
+    const x = e.touches[0].clientX;
+    const y = e.touches[0].clientY;
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    const distance = Math.hypot(centerX - x, centerY - y);
+    if(distance < 50){
+      touchStartTime = Date.now();
+    }
+  }
+});
+document.addEventListener('touchend', e => {
+  if(touchStartTime && (Date.now() - touchStartTime) > 800){
+    adminBtn.style.display = 'inline-block';
+  }
+  touchStartTime = 0;
+});
+
+// Admin button click
+adminBtn.addEventListener('click', () => {
+  if (!isAdmin) authDialog.showModal();
+  else openEditor();
+});
+
+// Admin login dialog
+authDialog.addEventListener('close', () => {
+  if (authDialog.returnValue === 'ok' && passInput.value === ADMIN_PASS) {
+    isAdmin = true;
+    openEditor();
+  }
+});
+
+// Cancel buttons
+authDialog.querySelector('button[value="cancel"]').addEventListener('click', e=>{ e.preventDefault(); authDialog.close(); });
+editDialog.querySelector('button[value="cancel"]').addEventListener('click', e=>{ e.preventDefault(); editDialog.close(); form.reset(); });
+
+// Save note
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  const data = {
+    title: titleInput.value, body: bodyInput.value,
+    verse: verseInput.value, tags: tagsInput.value.split(',').map(t=>t.trim()).filter(Boolean),
+    date: dateInput.value
+  };
+  if (noteId.value) updateNote(noteId.value, data);
+  else addNote(data);
+  editDialog.close(); form.reset();
+});
+
+// Export / Import
+document.getElementById('btnExport').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(notes,null,2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='notes.json'; a.click();
+});
+document.getElementById('importFile').addEventListener('change', async e => {
+  const file=e.target.files[0]; if(!file) return;
+  const list=JSON.parse(await file.text());
+  if(Array.isArray(list)){ notes=list; saveNotes(); render(); }
+});
+
+// Helper functions
+function loadNotes(){ return JSON.parse(localStorage.getItem(STORE_KEY)||'[]'); }
+function saveNotes(){ localStorage.setItem(STORE_KEY, JSON.stringify(notes)); }
+function addNote(data){ notes.unshift({...data,id:crypto.randomUUID()}); saveNotes(); render(); }
+function updateNote(id,data){ const i=notes.findIndex(n=>n.id===id); notes[i]={...notes[i],...data}; saveNotes(); render(); }
+function deleteNote(id){ if(confirm('Delete this note?')){ notes=notes.filter(n=>n.id!==id); saveNotes(); render(); } }
+function openEditor(editing=false){ 
+  if(!isAdmin){ alert('Admin only'); return; } 
+  editDialog.showModal(); 
+  if(!editing) form.reset(); 
+}
+function render(){
+  grid.innerHTML='';
+  if(!notes.length){ emptyState.hidden=false; return; } emptyState.hidden=true;
+  notes.forEach(n=>{
+    const node=tpl.content.firstElementChild.cloneNode(true);
+    node.dataset.id=n.id; node.querySelector('h3').textContent=n.title;
+    node.querySelector('.meta').textContent=[n.date, n.tags?.map(t=>'#'+t).join(' ')].filter(Boolean).join(' • ');
+    node.querySelector('.body').textContent=n.body;
+    const tagsWrap=node.querySelector('.tags'); n.tags?.forEach(t=>{const span=document.createElement('span'); span.className='tag'; span.textContent=t; tagsWrap.append(span);});
+    const verseLink=node.querySelector('[data-role="verse"]');
+    if(n.verse){ verseLink.href=`https://biblegateway.com/passage/?search=${encodeURIComponent(n.verse)}`; verseLink.textContent=n.verse; } else verseLink.style.display='none';
+    node.querySelector('[data-role="copy"]').onclick=()=>navigator.clipboard.writeText(`${n.title}\n${n.body}\n${n.verse||''}`);
+    node.querySelector('[data-role="del"]').onclick=()=>deleteNote(n.id);
+    node.querySelector('[data-role="edit"]').onclick=()=>{ if(!isAdmin) return alert('Admin only'); noteId.value=n.id; titleInput.value=n.title; dateInput.value=n.date; verseInput.value=n.verse; tagsInput.value=n.tags.join(', '); bodyInput.value=n.body; openEditor(true); };
+    grid.append(node);
+  });
+}
+</script>
+</body>   
+</html>
